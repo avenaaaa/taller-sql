@@ -9,7 +9,9 @@ Práctica de SQL con datos reales de la NBA 2015-16 y de la final de 2016.
 - **Aprender:** por tema, ejemplos resueltos donde predices el resultado antes de verlo, con el paso a paso de lo que hace el motor y la versión con el error típico.
 - **Practicar:** ejercicios que se comprueban solos, con dos pistas, la solución con su paso a paso y la opción de ejecutar sin que cuente como intento.
 - **Referencia:** todos los ejemplos con su resultado, buscador, lo propio de BigQuery y una tabla de errores frecuentes.
-- **Pizarra libre** para probar cualquier consulta, y un módulo final con datos de banco.
+- **Mapa de las tablas:** diagrama entidad relación con llaves PK y FK y líneas 1 a N. Click en una tabla abre su ficha: columnas y tipos, cuántos NULL tiene cada una, cómo se une con las demás (si el JOIN multiplica filas o deja filas sin pareja) y todas sus filas.
+- **Pizarra libre:** una consola como la de BigQuery, con árbol de tablas, editor con colores y números de línea, resultado con filas y tiempo, e historial de las últimas 15 consultas.
+- Un módulo final con datos de banco.
 
 Temas: lo básico (SELECT, WHERE, ORDER BY, CASE), NULL con AND y OR, JOIN, GROUP BY con WHERE y HAVING, subconsultas y CTE, funciones de ventana, duplicados y filas que se multiplican, y fechas en BigQuery.
 

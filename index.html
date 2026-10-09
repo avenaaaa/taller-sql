@@ -191,20 +191,6 @@ table.res td.nul, table.res td.nul.k { background: var(--nul-bg); color: var(--n
 .modulo.abierto > .modulo-btn { color: var(--accent); }
 .modulo-items { display: flex; flex-direction: column; gap: 1px; padding-left: 8px; border-left: 2px solid var(--line); margin-left: 8px; margin-bottom: 6px; }
 .grupo-nom { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 8px 8px 2px; }
-.tablas-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; }
-.tablas-panel > summary { cursor: pointer; font-weight: 600; font-size: 14.5px; }
-.tablas-panel[open] > summary { margin-bottom: 10px; }
-.conexiones { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.conexiones code { background: var(--key-bg); color: var(--key); font-weight: 600; font-size: 12.5px; }
-.tchips { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
-.tchip { border: 1px solid var(--line); border-radius: var(--r); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; min-width: 0; background: var(--bg); }
-.tchip .nom { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.tchip .nom b { font-family: var(--mono); font-size: 14px; }
-.tchip .cols { font-family: var(--mono); font-size: 12px; color: var(--muted); line-height: 1.6; }
-.tchip .cols .llave { color: var(--key); background: var(--key-bg); padding: 0 4px; border-radius: 3px; font-weight: 600; }
-.tchip p { font-size: 12.5px; color: var(--muted); }
-.tchip .btn { align-self: flex-start; }
-.filas-tabla { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 
 .leccion { display: flex; flex-direction: column; gap: 22px; }
 .ejemplo { display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; border-bottom: 1px solid var(--line); min-width: 0; }
@@ -241,11 +227,121 @@ table.ref code.rojo { background: var(--bad-bg); color: var(--bad); }
 .orden-chips span { font-family: var(--mono); font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
 .orden-chips span em { font-style: normal; font-family: var(--body); font-weight: 400; color: var(--ink); margin-left: 6px; }
 .orden-chips i { font-style: normal; color: var(--muted); }
-select#libre-esq { font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--ink); }
+
+/* ---- Mapa de las tablas ---- */
+.mapa-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.mapa-panel > summary { cursor: pointer; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; list-style: none; }
+.mapa-panel > summary::-webkit-details-marker { display: none; }
+.mapa-panel > summary::before { content: "▸"; color: var(--muted); font-size: 13px; transition: transform .15s; display: inline-block; }
+.mapa-panel[open] > summary::before { transform: rotate(90deg); }
+.mapa-panel > summary .mp-tit { font-weight: 600; font-size: 14.5px; }
+.mapa-panel > summary .muted { font-size: 13.5px; }
+.mapa-panel[open] > summary { border-bottom: 1px solid var(--line); }
+.mapa-cuerpo { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.mapa-ley { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
+.pill { display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; line-height: 1; padding: 3px 5px; border-radius: 3px; vertical-align: 1px; color: var(--key); background: var(--key-bg); border: 1px solid var(--key-bg); }
+.pill.fk { background: transparent; border-color: var(--key-line); }
+.mapa-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+svg.er { display: block; width: 100%; max-width: var(--er-w, 780px); min-width: 640px; height: auto; font-family: var(--mono); user-select: none; }
+.er .caja { fill: var(--surface); }
+.er .cab { fill: var(--sunken); }
+.er .sep { stroke: var(--line); }
+.er .borde { fill: none; stroke: var(--line); stroke-width: 1.3; }
+.er .tnom { font-size: 13.5px; font-weight: 600; fill: var(--ink); }
+.er .talias { font-size: 12px; fill: var(--muted); }
+.er .col { font-size: 12.5px; fill: var(--ink); }
+.er .b-pk rect { fill: var(--key-bg); stroke: var(--key-bg); }
+.er .b-fk rect { fill: none; stroke: var(--key-line); }
+.er .b-pk text, .er .b-fk text { font-size: 10px; font-weight: 700; fill: var(--key); }
+.er .t { cursor: pointer; transition: opacity .15s; }
+.er .t:focus { outline: none; }
+.er .t:hover .borde, .er .t:focus-visible .borde { stroke: var(--accent); stroke-width: 2; }
+.er .t.sel .borde { stroke: var(--accent); stroke-width: 2.6; }
+.er .t.sel .cab { fill: var(--accent-soft); }
+.er .t.lejos { opacity: .38; }
+.er .t.aislada .borde { stroke-dasharray: 5 4; }
+.er .rel path { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+.er .rel text { font-family: var(--body); font-size: 12px; font-weight: 600; fill: var(--muted); }
+.er .rel.on path { stroke: var(--accent); stroke-width: 2.4; }
+.er .rel.on text { fill: var(--accent); }
+.ficha { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ficha-cab { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.ficha-cab h3 { font-size: 17px; }
+.ficha-cab .sep { flex: 1 1 auto; }
+.ficha-nota { font-size: 14.5px; max-width: 80ch; }
+.ficha-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.ficha-cols, .une { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+table.cols-t th, table.cols-t td { white-space: nowrap; padding: 6px 10px; }
+table.cols-t td { font-size: 13px; }
+table.cols-t td.con-nulos { color: var(--nul); font-weight: 600; }
+.llave-txt { font-size: 13px; }
+.une-item { display: flex; flex-direction: column; gap: 6px; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
+.une-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.une-item pre.sql { font-size: 12.5px; padding: 8px 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.une-item p { font-size: 13.5px; }
+.une-item .sin-par { color: var(--ink); background: var(--nul-bg); border-radius: var(--r); padding: 6px 10px; }
+.une-item .btn { align-self: flex-start; }
+
+/* ---- Editor con colores ---- */
+.editor-sql { display: grid; grid-template-columns: auto minmax(0, 1fr); background: var(--editor); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.editor-sql:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.gutter { font-family: var(--mono); font-size: 14px; line-height: 21px; padding: 12px 8px 12px 10px; min-width: 36px; text-align: right; white-space: pre; color: var(--muted); background: var(--sunken); border-right: 1px solid var(--line); user-select: none; font-variant-numeric: tabular-nums; }
+.capa { position: relative; min-width: 0; }
+.capa pre.sql-capa, .capa #editor { font-family: var(--mono); font-size: 14px; line-height: 21px; letter-spacing: 0; padding: 12px 14px; margin: 0; border: 0; border-radius: 0; tab-size: 2; white-space: pre; word-wrap: normal; }
+.capa pre.sql-capa { position: absolute; inset: 0; overflow: hidden; pointer-events: none; color: var(--ink); background: transparent; }
+.capa #editor { position: relative; display: block; width: 100%; min-height: 0; resize: none; background: transparent; color: transparent; caret-color: var(--ink); overflow-x: auto; overflow-y: hidden; }
+.capa #editor:focus-visible { outline: none; }
+.capa #editor::placeholder { color: var(--muted); opacity: 1; }
+.capa #editor::selection { background: color-mix(in srgb, var(--accent) 28%, transparent); color: transparent; }
+.sql-capa .num { color: var(--numc); }
+
+/* ---- Pizarra libre: consola ---- */
+.consola { display: grid; grid-template-columns: 236px minmax(0, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.arbol { background: var(--bg); border-right: 1px solid var(--line); padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.seg { display: inline-flex; align-self: flex-start; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 5px 14px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.arbol-ayuda { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.arbol-lista, .arbol-cols { list-style: none; margin: 0; padding: 0; }
+.arbol-lista > li + li { margin-top: 1px; }
+.arbol-t { display: flex; align-items: center; gap: 2px; }
+.arbol-t .chev { border: 0; background: transparent; width: 22px; height: 26px; flex: none; color: var(--muted); font-size: 12px; border-radius: 4px; transition: transform .15s; }
+.arbol-t .chev:hover { background: var(--sunken); color: var(--ink); }
+.abierta > .arbol-t .chev { transform: rotate(90deg); }
+.arbol-t .nodo { flex: 1 1 auto; min-width: 0; border: 0; background: transparent; text-align: left; font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); padding: 4px 6px; border-radius: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.arbol-t .nodo:hover { background: var(--sunken); color: var(--accent); }
+.arbol-t .n { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 4px; }
+.arbol-cols { margin: 2px 0 8px 22px; padding-left: 8px; border-left: 1px solid var(--line); }
+.arbol-cols button { width: 100%; display: flex; gap: 6px; align-items: center; border: 0; background: transparent; text-align: left; font-family: var(--mono); font-size: 12.5px; color: var(--ink); padding: 3px 6px; border-radius: 4px; }
+.arbol-cols button:hover { background: var(--sunken); color: var(--accent); }
+.arbol-cols .cn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.arbol-cols .tipo { margin-left: auto; font-size: 11px; color: var(--muted); }
+.arbol-cols .previa { font-family: var(--body); font-size: 12.5px; color: var(--accent); font-weight: 600; }
+.ver-mapa { align-self: flex-start; margin-top: 4px; }
+.consola-main { display: flex; flex-direction: column; gap: 12px; padding: 12px 14px 14px; min-width: 0; }
+.barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.barra .sep { flex: 1 1 auto; }
+.chip-esq { font-size: 12.5px; color: var(--muted); }
+.solo-movil { display: none; }
+.hist { border: 1px solid var(--line); border-radius: var(--r); background: var(--bg); padding: 6px; display: flex; flex-direction: column; gap: 2px; max-height: 300px; overflow-y: auto; }
+.hist > p { padding: 6px 8px; font-size: 13px; }
+.hist-item { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; text-align: left; border: 0; background: transparent; padding: 6px 8px; border-radius: 4px; min-width: 0; }
+.hist-item:hover { background: var(--surface); }
+.hist-item code { background: transparent; padding: 0; font-size: 12.5px; color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-item .muted { font-size: 11.5px; }
+.libre-res { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.res-libre { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.res-vacio { color: var(--muted); font-size: 14px; border: 1px dashed var(--line); border-radius: var(--r); padding: 18px; text-align: center; }
 @media (max-width: 860px) {
   .nav-toggle { display: inline-flex; }
   .lista.cerrada > :not(.nav-toggle) { display: none; }
   .par { grid-template-columns: minmax(0, 1fr); }
+  .ficha-grid { grid-template-columns: minmax(0, 1fr); }
+  .consola { grid-template-columns: minmax(0, 1fr); }
+  .arbol { border-right: 0; border-bottom: 1px solid var(--line); }
+  .consola.arbol-cerrado .arbol { display: none; }
+  .solo-movil { display: inline-flex; }
 }
 
 .orden { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -1878,10 +1974,10 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
 
   /* ---------- Estado ---------- */
   var VISTA0 = { tab: "aprender", mod: "m1", tipo: "apr", id: null };
-  var estado = { ej: {}, apr: {}, vista: Object.assign({}, VISTA0), libre: "", libreEsq: "nba" };
+  var estado = { ej: {}, apr: {}, vista: Object.assign({}, VISTA0), libre: "", libreEsq: "nba", hist: [] };
   try {
     var g = JSON.parse(localStorage.getItem(CLAVE));
-    if (g && g.ej) { estado.ej = g.ej; estado.apr = g.apr || {}; estado.libre = g.libre || ""; estado.libreEsq = g.libreEsq || "nba"; if (g.vista && g.vista.tab) estado.vista = g.vista; }
+    if (g && g.ej) { estado.ej = g.ej; estado.apr = g.apr || {}; estado.libre = g.libre || ""; estado.libreEsq = g.libreEsq || "nba"; estado.hist = Array.isArray(g.hist) ? g.hist.slice(0, 15) : []; if (g.vista && g.vista.tab) estado.vista = g.vista; }
   } catch (e) {}
   function vistaValida(v) { return v && (v.tab === "referencia" || v.tab === "libre" || (v.tipo === "apr" && modulo(v.mod).aprender.length) || (v.tipo === "ej" && buscar(v.id))); }
   if (!vistaValida(estado.vista)) estado.vista = Object.assign({}, VISTA0);
@@ -1891,7 +1987,7 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
     if (!estado.ej[id]) estado.ej[id] = { n: 0, primero: null, pistas: 0, vioSol: false, ok: false, como: null, nOk: null, q: "", q1: "", exp: 0 };
     return estado.ej[id];
   }
-  var vista = { solAbierta: false, ultimo: null, demo: false, revelados: {}, errores: {}, filas: null };
+  var vista = { solAbierta: false, ultimo: null, demo: false, revelados: {}, errores: {}, mapa: {}, sel: {}, arbol: {}, arbolMovil: false, histAbierto: false };
   function limpiarVista() { vista.solAbierta = false; vista.ultimo = null; vista.demo = false; }
 
   /* ---------- Motor ---------- */
@@ -1915,8 +2011,8 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
     if (msg === "vacia") return "El editor está vacío. Escribe una consulta, aunque sea a medias.";
     if ((m = /near "(.+?)": syntax error/.exec(msg))) return "Error de sintaxis cerca de «" + m[1] + "». Mira lo que escribiste justo antes: suele faltar una coma o una palabra clave (FROM, JOIN, ON), o sobra algo.";
     if (/incomplete input/.test(msg)) return "La consulta está incompleta: quedó algo sin cerrar (un paréntesis, una comilla) o una cláusula sin terminar.";
-    if ((m = /no such table: (.+)/.exec(msg))) return "No existe la tabla «" + m[1] + "». Revisa el nombre en «Las tablas», y que el alias vaya después del nombre: FROM jugadores j.";
-    if ((m = /no such column: (.+)/.exec(msg))) return "No existe la columna «" + m[1] + "». Revisa el nombre en «Las tablas», y que el alias sea el de la tabla que la tiene.";
+    if ((m = /no such table: (.+)/.exec(msg))) return "No existe la tabla «" + m[1] + "». Revisa el nombre en el mapa de las tablas, y que el alias vaya después del nombre: FROM jugadores j.";
+    if ((m = /no such column: (.+)/.exec(msg))) return "No existe la columna «" + m[1] + "». Revisa el nombre en el mapa de las tablas, y que el alias sea el de la tabla que la tiene.";
     if ((m = /ambiguous column name: (.+)/.exec(msg))) return "La columna «" + m[1] + "» existe en más de una tabla. Dile al motor cuál quieres con el alias de la tabla, por ejemplo j." + m[1] + ".";
     if (/misuse of aggregate/.test(msg)) return "Usaste COUNT, SUM o AVG donde no se puede, normalmente en el WHERE. ¿La condición se revisa mirando una sola fila? WHERE. ¿Necesita juntar varias? HAVING, después del GROUP BY.";
     if ((m = /no such function: (.+)/.exec(msg))) return "La función «" + m[1] + "» no existe en este motor." + (/^(IF|IIF)$/i.test(m[1]) ? " Para una condición dentro de una columna usa CASE WHEN … THEN … ELSE … END." : "");
@@ -1944,7 +2040,7 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
   /* ---------- Piezas de dibujo ---------- */
   var KW = ["SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LEFT JOIN", "JOIN", "ON", "AND", "OR", "AS", "IN", "BETWEEN", "LIKE", "IS NOT NULL", "IS NULL", "NULL", "DISTINCT", "LIMIT", "DESC", "ASC", "WITH", "OVER", "PARTITION BY", "QUALIFY", "NOT", "EXCEPT", "TRUE", "CASE", "WHEN", "THEN", "ELSE", "END", "DATE", "DAY", "MONTH", "WEEK", "YEAR"];
   var FN = ["COUNT", "SUM", "AVG", "MIN", "MAX", "COALESCE", "IFNULL", "LOWER", "ROW_NUMBER", "RANK", "COUNTIF", "EXTRACT", "DATE_TRUNC", "DATE_DIFF", "FORMAT_DATE", "SAFE_DIVIDE"];
-  var RE_SQL = new RegExp("(--[^\\n]*)|('(?:[^']|'')*')|(`[^`]*`)|\\b(" + KW.map(function (k) { return k.replace(/ /g, "\\s+"); }).join("|") + ")\\b|\\b(" + FN.join("|") + ")(?=\\s*\\()|\\b(\\d+(?:\\.\\d+)?)\\b", "g");
+  var RE_SQL = new RegExp("(--[^\\n]*)|('(?:[^']|'')*')|(`[^`]*`)|\\b(" + KW.map(function (k) { return k.replace(/ /g, "\\s+"); }).join("|") + ")\\b|\\b(" + FN.join("|") + ")(?=\\s*\\()|\\b(\\d+(?:\\.\\d+)?)\\b", "gi");
   function escH(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function pintarSql(sql) {
     var out = "", i = 0, m; RE_SQL.lastIndex = 0;
@@ -1981,29 +2077,170 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
   function nFilas(n) { return n === 1 ? "1 fila" : n + " filas"; }
   function bloqueResultado(titulo, res, hl, bool, max) { return el("div", { class: "t-wrap" }, el("div", { class: "t-tit", text: titulo + " · " + nFilas(res.filas.length) }), tabla(res, hl, { bool: bool, max: max || 30 })); }
 
-  /* ---------- Las tablas ---------- */
-  function panelTablas(k, abierto) {
-    var d = el("details", { class: "tablas-panel", open: abierto ? true : null }, el("summary", { text: k === "nba" ? "Las tablas: NBA 2015-16 y la final de 2016" : "Las tablas: el banco" }));
-    var cx = el("div", { class: "conexiones" }, el("span", { class: "muted", text: "Cómo se conectan:" }));
-    CONEX[k].forEach(function (c) { cx.appendChild(el("code", { text: c })); });
-    d.appendChild(cx);
-    var g = el("div", { class: "tchips" }), filas = el("div", { class: "filas-tabla" });
-    var cols = {}; TABLAS[k].forEach(function (t) { try { cols[t.nombre] = fijo(k, "SELECT * FROM " + t.nombre + " LIMIT 0").cols; } catch (e) { cols[t.nombre] = []; } });
+  /* ---------- Las tablas: mapa de relaciones y ficha de cada tabla ---------- */
+  var PK = { nba: { equipos: ["equipo_id"], jugadores: ["jugador_id"], finales: ["partido"] }, banco: { clientes: ["cliente_id"], cuentas: ["cuenta_id"], movimientos: ["mov_id"] } };
+  var POS = {
+    nba: { equipos: [0, 0], jugadores: [1, 0], estadisticas: [2, 0], finales: [0, 196], puntos_finales: [1, 196], premios: [2, 196], carga_puntos: [1, 326] },
+    banco: { clientes: [0, 0], cuentas: [1, 0], movimientos: [2, 0] }
+  };
+  var ER = { W: 196, GAP: 76, CAB: 32, FILA: 22 }, infoCache = {}, SVGNS = "http://www.w3.org/2000/svg";
+  function relaciones(k) {
+    return CONEX[k].map(function (c) { var p = c.split("="), a = p[0].trim().split("."), b = p[1].trim().split("."); return { t: a[0], c: a[1], pt: b[0], pc: b[1] }; });
+  }
+  function infoTablas(k) {
+    if (infoCache[k]) return infoCache[k];
+    var rels = relaciones(k), out = {};
     TABLAS[k].forEach(function (t) {
-      var lista = el("div", { class: "cols" });
-      cols[t.nombre].forEach(function (c, i) { if (i) lista.appendChild(document.createTextNode(", ")); lista.appendChild(el("span", { class: t.llaves.indexOf(c) >= 0 ? "llave" : null, text: c })); });
-      g.appendChild(el("div", { class: "tchip" },
-        el("div", { class: "nom" }, el("b", { text: t.nombre }), el("span", { class: "muted", text: "alias: " + t.alias })),
-        lista, el("p", { text: t.nota }),
-        el("button", { class: "btn small", type: "button", onclick: function () {
-          filas.textContent = "";
-          if (vista.filas === k + t.nombre) { vista.filas = null; return; }
-          vista.filas = k + t.nombre; var r = fijo(k, "SELECT * FROM " + t.nombre);
-          filas.appendChild(el("div", { class: "res-head" }, el("b", { class: "mono", text: t.nombre }), el("span", { class: "muted", text: nFilas(r.filas.length) })));
-          filas.appendChild(tabla(r, t.llaves, { alta: true }));
-        } }, "Ver filas")));
+      var cols = fijo(k, "PRAGMA table_info(" + t.nombre + ")").filas.map(function (f) { return { nombre: f[1], tipo: f[2] || "" }; });
+      cols.forEach(function (c) {
+        c.pk = (PK[k][t.nombre] || []).indexOf(c.nombre) >= 0;
+        rels.forEach(function (r) { if (r.t === t.nombre && r.c === c.nombre) c.fk = r; });
+        c.nulos = fijo(k, "SELECT COUNT(*) - COUNT(" + c.nombre + ") FROM " + t.nombre).filas[0][0];
+      });
+      out[t.nombre] = { t: t, cols: cols, n: fijo(k, "SELECT COUNT(*) FROM " + t.nombre).filas[0][0] };
     });
-    d.appendChild(g); d.appendChild(filas);
+    infoCache[k] = out;
+    return out;
+  }
+  function sv(tag, attrs, txt) { var n = document.createElementNS(SVGNS, tag); for (var a in attrs || {}) n.setAttribute(a, attrs[a]); if (txt != null) n.textContent = txt; return n; }
+  function resaltar(svg, nom) {
+    var sel = svg.getAttribute("data-sel") || "", foco = nom || sel, vec = {};
+    [].forEach.call(svg.querySelectorAll(".rel"), function (r) {
+      var on = !!foco && (r.getAttribute("data-a") === foco || r.getAttribute("data-b") === foco);
+      r.classList.toggle("on", on);
+      if (on) { vec[r.getAttribute("data-a")] = 1; vec[r.getAttribute("data-b")] = 1; r.parentNode.appendChild(r); }
+    });
+    if (foco) vec[foco] = 1;
+    [].forEach.call(svg.querySelectorAll(".t"), function (t) { var n = t.getAttribute("data-t"); t.classList.toggle("sel", n === sel); t.classList.toggle("lejos", !!foco && !vec[n]); });
+  }
+  function mapaEr(k, alElegir) {
+    var info = infoTablas(k), rels = relaciones(k), P = POS[k], W = ER.W, cajas = {}, maxX = 0, maxY = 0;
+    Object.keys(P).forEach(function (nom) {
+      if (!info[nom]) return;
+      var x = P[nom][0] * (W + ER.GAP), y = P[nom][1], h = ER.CAB + info[nom].cols.length * ER.FILA + 6;
+      cajas[nom] = { x: x, y: y, h: h }; maxX = Math.max(maxX, x + W); maxY = Math.max(maxY, y + h);
+    });
+    var svg = sv("svg", { class: "er", viewBox: "-12 -12 " + (maxX + 24) + " " + (maxY + 24), role: "group", "aria-label": "Mapa de relaciones entre las tablas" });
+    svg.style.setProperty("--er-w", (maxX + 24) + "px");
+    function yCol(nom, col) { var i = info[nom].cols.map(function (c) { return c.nombre; }).indexOf(col); return cajas[nom].y + ER.CAB + i * ER.FILA + ER.FILA / 2; }
+    var capaRel = sv("g", { class: "capa-rel" }), capaT = sv("g");
+    svg.appendChild(capaRel); svg.appendChild(capaT);
+    rels.forEach(function (r) {
+      var A = cajas[r.t], B = cajas[r.pt]; if (!A || !B) return;
+      var ay = yCol(r.t, r.c), by = yCol(r.pt, r.pc), ax, bx, mx, la, lb;
+      if (A.x > B.x) { ax = A.x; bx = B.x + W; mx = (ax + bx) / 2; la = -1; lb = 1; }
+      else if (A.x < B.x) { ax = A.x + W; bx = B.x; mx = (ax + bx) / 2; la = 1; lb = -1; }
+      else { ax = A.x + W; bx = B.x + W; mx = ax + ER.GAP / 2; la = 1; lb = 1; }
+      var g = sv("g", { class: "rel", "data-a": r.t, "data-b": r.pt });
+      g.appendChild(sv("title", null, r.t + "." + r.c + " = " + r.pt + "." + r.pc));
+      g.appendChild(sv("path", { d: "M" + ax + " " + ay + " H" + mx + " V" + by + " H" + bx }));
+      g.appendChild(sv("text", { x: ax + la * 7, y: ay - 5, "text-anchor": la < 0 ? "end" : "start" }, "N"));
+      g.appendChild(sv("text", { x: bx + lb * 7, y: by - 5, "text-anchor": lb < 0 ? "end" : "start" }, "1"));
+      capaRel.appendChild(g);
+    });
+    Object.keys(cajas).forEach(function (nom) {
+      var c = cajas[nom], it = info[nom], aislada = !rels.some(function (r) { return r.t === nom || r.pt === nom; });
+      var g = sv("g", { class: "t" + (aislada ? " aislada" : ""), "data-t": nom, transform: "translate(" + c.x + " " + c.y + ")", tabindex: "0", role: "button", "aria-label": "Tabla " + nom + ": ver su ficha" });
+      g.appendChild(sv("rect", { class: "caja", width: W, height: c.h, rx: 6 }));
+      g.appendChild(sv("path", { class: "cab", d: "M0 6 A6 6 0 0 1 6 0 H" + (W - 6) + " A6 6 0 0 1 " + W + " 6 V" + ER.CAB + " H0 Z" }));
+      g.appendChild(sv("line", { class: "sep", x1: 0, x2: W, y1: ER.CAB, y2: ER.CAB }));
+      g.appendChild(sv("text", { class: "tnom", x: 12, y: 21 }, nom));
+      g.appendChild(sv("text", { class: "talias", x: W - 12, y: 21, "text-anchor": "end" }, it.t.alias));
+      it.cols.forEach(function (col, i) {
+        var y = ER.CAB + i * ER.FILA, tipo = col.pk ? "PK" : col.fk ? "FK" : null;
+        g.appendChild(sv("text", { class: "col", x: 12, y: y + 15 }, col.nombre));
+        if (tipo) {
+          var b = sv("g", { class: "b-" + tipo.toLowerCase() });
+          b.appendChild(sv("rect", { x: W - 40, y: y + 4, width: 28, height: 15, rx: 3 }));
+          b.appendChild(sv("text", { x: W - 26, y: y + 15, "text-anchor": "middle" }, tipo));
+          g.appendChild(b);
+        }
+      });
+      g.appendChild(sv("rect", { class: "borde", width: W, height: c.h, rx: 6 }));
+      g.addEventListener("click", function () { alElegir(nom); });
+      g.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); alElegir(nom); } });
+      g.addEventListener("mouseenter", function () { resaltar(svg, nom); });
+      g.addEventListener("mouseleave", function () { resaltar(svg, null); });
+      capaT.appendChild(g);
+    });
+    return svg;
+  }
+  function pill(tipo) { return el("span", { class: "pill " + tipo.toLowerCase(), text: tipo }); }
+  function filasTxt(n, de) { return n === 1 ? "1 fila de " + de : n + " filas de " + de; }
+  function fichaTabla(k, nom, opts, cerrar) {
+    var info = infoTablas(k), it = info[nom], t = it.t, rels = relaciones(k);
+    var f = el("section", { class: "ficha", "aria-label": "Ficha de la tabla " + nom });
+    f.appendChild(el("div", { class: "ficha-cab" },
+      el("h3", { class: "mono", text: nom }), el("span", { class: "muted", text: "alias " + t.alias + " · " + nFilas(it.n) + " · " + it.cols.length + " columnas" }),
+      el("span", { class: "sep" }), el("button", { class: "btn small", type: "button", onclick: cerrar }, "Cerrar la ficha")));
+    f.appendChild(el("p", { class: "ficha-nota", text: t.nota }));
+    var tb = el("tbody");
+    it.cols.forEach(function (c) {
+      tb.appendChild(el("tr", null,
+        el("td", { class: "mono", text: c.nombre }),
+        el("td", { class: "mono muted", text: c.tipo }),
+        el("td", { title: c.fk ? "Apunta a " + c.fk.pt + "." + c.fk.pc : null }, c.pk ? pill("PK") : c.fk ? el("span", { class: "llave-txt" }, pill("FK"), el("span", { class: "mono", text: " → " + c.fk.pt })) : el("span", { class: "muted", text: "—" })),
+        el("td", { class: c.nulos ? "con-nulos" : "muted", text: c.nulos ? c.nulos + " de " + it.n : "—" })));
+    });
+    var colsT = el("div", { class: "ficha-cols" }, el("div", { class: "t-tit", text: "Columnas" }),
+      el("div", { class: "t-scroll ancha" }, el("table", { class: "ref cols-t" }, el("thead", null, el("tr", null, el("th", { text: "Columna" }), el("th", { text: "Tipo" }), el("th", { text: "Llave" }), el("th", { text: "NULL" }))), tb)));
+    var une = el("div", { class: "une" }, el("div", { class: "t-tit", text: "Cómo se une" }));
+    var mias = rels.filter(function (r) { return r.t === nom || r.pt === nom; });
+    if (!mias.length) une.appendChild(el("p", { class: "muted", text: "No se une con ninguna otra tabla: está aparte a propósito." }));
+    mias.forEach(function (r) {
+      var soyN = r.t === nom, otra = soyN ? r.pt : r.t, a1 = t.alias, a2 = info[otra].t.alias, mia = soyN ? r.c : r.pc, suya = soyN ? r.pc : r.c;
+      var sql = "FROM " + nom + " " + a1 + "\nJOIN " + otra + " " + a2 + " ON " + a2 + "." + suya + " = " + a1 + "." + mia;
+      var item = el("div", { class: "une-item" }, preSql(sql));
+      if (soyN) item.appendChild(el("p", null, el("b", { text: "N → 1. " }), "Cada fila de " + nom + " calza con una sola de " + otra + ": este JOIN no multiplica filas."));
+      else {
+        var mx = fijo(k, "SELECT MAX(c) FROM (SELECT COUNT(*) AS c FROM " + otra + " WHERE " + r.c + " IS NOT NULL GROUP BY " + r.c + ")").filas[0][0] || 0;
+        item.appendChild(el("p", null, el("b", { text: "1 → N. " }), "Una fila de " + nom + " puede calzar con varias de " + otra + (mx > 1 ? " (aquí, hasta " + mx + ")" : "") + ": al unir, se repite una vez por cada una."));
+      }
+      var cond = " FROM " + nom + " x WHERE NOT EXISTS (SELECT 1 FROM " + otra + " y WHERE y." + suya + " = x." + mia + ")";
+      var sinPar = fijo(k, "SELECT COUNT(*)" + cond).filas[0][0];
+      if (sinPar) {
+        var muestra = it.cols.some(function (c) { return c.nombre === "nombre"; }) ? "nombre" : mia;
+        var ej = fijo(k, "SELECT " + muestra + cond + " LIMIT 3").filas.map(function (f) { return f[0] === null ? "NULL" : String(f[0]); });
+        item.appendChild(el("p", { class: "sin-par" }, filasTxt(sinPar, nom) + (sinPar === 1 ? " no tiene" : " no tienen") + " pareja en " + otra + " (por ejemplo " + ej.join(", ") + (sinPar > ej.length ? "…" : "") + "): ",
+          el("b", { text: "un JOIN " + (sinPar === 1 ? "la saca" : "las saca") + " y un LEFT JOIN " + (sinPar === 1 ? "la deja" : "las deja") }), ", con NULL en las columnas de " + otra + "."));
+      }
+      if (opts.alInsertar) item.appendChild(el("button", { class: "btn small", type: "button", onclick: function () { opts.alInsertar(sql); } }, "Escribir en el editor"));
+      une.appendChild(item);
+    });
+    f.appendChild(el("div", { class: "ficha-grid" }, colsT, une));
+    var filas = fijo(k, "SELECT * FROM " + nom), claves = it.cols.filter(function (c) { return c.pk || c.fk; }).map(function (c) { return c.nombre; });
+    f.appendChild(el("div", { class: "t-wrap" }, el("div", { class: "t-tit", text: "Filas · " + nFilas(filas.filas.length) + (claves.length ? " · llaves en amarillo" : "") }), tabla(filas, claves, { alta: true })));
+    return f;
+  }
+  function panelTablas(k, opts) {
+    opts = opts || {};
+    var clave = (opts.ctx || "tema") + ":" + k, nTab = TABLAS[k].length;
+    var d = el("details", { class: "mapa-panel", id: opts.id || null, open: vista.mapa[clave] ? true : null },
+      el("summary", null, el("span", { class: "mp-tit", text: "Mapa de las tablas" }), el("span", { class: "muted", text: (k === "nba" ? "NBA 2015-16 y la final de 2016" : "el banco") + " · " + nTab + " tablas" })));
+    d.addEventListener("toggle", function () { vista.mapa[clave] = d.open; });
+    var cuerpo = el("div", { class: "mapa-cuerpo" });
+    cuerpo.appendChild(el("div", { class: "mapa-ley" },
+      el("span", null, pill("PK"), " llave primaria: identifica cada fila, no se repite"),
+      el("span", null, pill("FK"), " llave foránea: apunta a la PK de otra tabla"),
+      el("span", null, el("b", { class: "mono", text: "1 — N" }), " una fila del lado 1 calza con varias del lado N")));
+    var ficha = el("div", { class: "ficha-slot" }), svg;
+    function pintarFicha() {
+      ficha.textContent = "";
+      var s = vista.sel[k];
+      if (s && TABLAS[k].some(function (t) { return t.nombre === s; })) ficha.appendChild(fichaTabla(k, s, opts, function () { elegir(s); }));
+    }
+    function elegir(nom) {
+      vista.sel[k] = vista.sel[k] === nom ? null : nom;
+      svg.setAttribute("data-sel", vista.sel[k] || ""); resaltar(svg, null); pintarFicha();
+      if (vista.sel[k]) { var r = ficha.getBoundingClientRect(); if (r.top > window.innerHeight - 170) window.scrollBy({ top: r.top - window.innerHeight + 300, behavior: "smooth" }); }
+    }
+    svg = mapaEr(k, elegir);
+    svg.setAttribute("data-sel", vista.sel[k] || "");
+    cuerpo.appendChild(el("div", { class: "mapa-scroll" }, svg));
+    cuerpo.appendChild(el("p", { class: "atajo", text: "Click en una tabla para ver su ficha: sus columnas, cómo se une con las demás y todas sus filas." }));
+    cuerpo.appendChild(ficha);
+    resaltar(svg, null); pintarFicha();
+    d.appendChild(cuerpo);
     return d;
   }
 
@@ -2135,12 +2372,11 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
       el("div", { class: "meta" }, el("span", { class: "eyebrow", text: m.titulo + " · ejercicio " + (x.i + 1) + " de " + m.practicar.length }), el("span", { class: "chip", text: e.practica }), el("span", { class: "chip estado " + mk.c, text: mk.t })),
       el("h2", { text: e.titulo }), el("p", { class: "texto", text: e.enunciado }),
       el("p", { class: "cols" }, "Columnas, en este orden: ", el("span", { class: "mono", text: e.columnas }), e.orden ? el("span", { text: " · el orden de las filas importa" }) : null)));
-    var ed = el("textarea", { id: "editor", spellcheck: "false", autocomplete: "off", autocorrect: "off", autocapitalize: "off", "aria-label": "Tu consulta SQL", placeholder: "Escribe aquí tu consulta…" });
-    ed.value = vista.demo ? vista.demoQ : (s.q || "");
+    var edc = editorSql({ valor: vista.demo ? vista.demoQ : (s.q || ""), placeholder: "Escribe aquí tu consulta…", min: 7 }), ed = edc.ta;
     ed.addEventListener("input", function () { vista.demo = false; s.q = ed.value; guardar(); });
     ed.addEventListener("keydown", teclas);
     var sinIntento = s.n < 1 && !s.vioSol;
-    C.appendChild(el("div", { class: "editor-box" }, ed,
+    C.appendChild(el("div", { class: "editor-box" }, edc.caja,
       el("div", { class: "acciones" },
         el("button", { class: "btn primary", type: "button", onclick: function () { correr(x); } }, "Ejecutar y comprobar"),
         el("button", { class: "btn", type: "button", title: "Muestra el resultado sin comprobarlo. No cuenta como intento.", onclick: function () { correr(x, true); } }, "Solo ejecutar"),
@@ -2173,6 +2409,7 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
       else { caja.appendChild(el("div", { class: "veredicto info", role: "status" }, el("div", { class: "tit", text: "Ejecutada sin comprobar. No cuenta como intento." }))); caja.appendChild(el("div", { class: "res-head" }, el("h3", { text: "Lo que devuelve" }), el("span", { class: "muted", text: nFilas(res.filas.length) }))); caja.appendChild(tabla(res, null, { alta: true })); }
     } else {
       if (!err) cmp = comparar(res, exp, e.orden);
+      if (cmp && cmp.ok && e.orden && !/\border\s+by\b/i.test(q.replace(/--[^\n]*/g, ""))) cmp = { ok: false, tipo: "sinorden" };
       var bien = !!(cmp && cmp.ok);
       if (!esDemo && err !== "vacia") {
         s.n++; s.q = q;
@@ -2185,6 +2422,7 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
       else if (bien && vista.solAbierta && !s.ok) caja.appendChild(el("div", { class: "veredicto info", role: "status" }, el("div", { class: "tit", text: "Está correcta, pero con la solución a la vista." }), el("div", { text: "Ocúltala, borra el editor y escríbela de nuevo sin mirar. Ahí cuenta." })));
       else if (bien) caja.appendChild(el("div", { class: "veredicto ok", role: "status" }, el("div", { class: "tit", text: "Correcto: " + nFilas(res.filas.length) + ", las mismas que la solución." }), cmp.nota ? el("div", { text: cmp.nota }) : null, el("div", { text: "Abre el paso a paso para comparar tu camino con el de la solución." })));
       else if (cmp.tipo === "columnas") caja.appendChild(el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: "Tu resultado tiene " + res.cols.length + (res.cols.length === 1 ? " columna" : " columnas") + " y se esperaban " + exp.cols.length + "." }), el("div", { text: "Revisa qué columnas pide el enunciado: " + e.columnas + "." })));
+      else if (cmp.tipo === "sinorden") caja.appendChild(el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: "Las filas calzan, y el orden también, pero por casualidad: tu consulta no tiene ORDER BY." }), el("div", { text: "Sin ORDER BY la base no garantiza ningún orden; en BigQuery puede cambiar de una ejecución a otra. Si el enunciado pide un orden, escríbelo." })));
       else if (cmp.tipo === "orden") caja.appendChild(el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: "Las filas son las correctas, pero en otro orden." }), el("div", { text: "Este ejercicio pide un orden: revisa el ORDER BY (¿falta DESC?)." })));
       else {
         var v = el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: "Todavía no. Tu consulta devuelve " + nFilas(res.filas.length) + " y se esperaban " + nFilas(exp.filas.length) + "." }));
@@ -2198,7 +2436,7 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
     vista.ultimo = caja;
     var pos = $("#editor").selectionStart;
     pintarLista(); pintarAvance(); pintarContenido();
-    var ed = $("#editor"); ed.value = q; ed.focus(); try { ed.selectionStart = ed.selectionEnd = pos; } catch (z) {}
+    var ed = $("#editor"); ed.value = q; if (ed.refrescar) ed.refrescar(); ed.focus(); try { ed.selectionStart = ed.selectionEnd = pos; } catch (z) {}
   }
   function panelSol(x, s) {
     var e = x.e, m = x.m, box = el("section", { class: "solucion", "aria-label": "Solución" });
@@ -2256,23 +2494,146 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
     });
   }
 
-  /* ---------- Pizarra libre ---------- */
-  function pintarLibre(C) {
-    C.appendChild(el("div", { class: "enun" }, el("h2", { text: "Pizarra libre" }), el("p", { class: "texto", text: "Ejecuta lo que quieras sobre las tablas, para probar una idea suelta o armar una consulta por partes." })));
-    var sel = el("select", { id: "libre-esq", "aria-label": "Qué tablas usar", onchange: function () { estado.libreEsq = sel.value; guardar(); vista.ultimo = null; pintarContenido(); } },
-      el("option", { value: "nba", selected: estado.libreEsq === "nba" ? true : null }, "Tablas NBA"), el("option", { value: "banco", selected: estado.libreEsq === "banco" ? true : null }, "Tablas del banco"));
-    C.appendChild(el("div", { class: "acciones" }, el("span", { class: "muted", text: "Tablas:" }), sel));
-    C.appendChild(panelTablas(estado.libreEsq, false));
-    var ed = el("textarea", { id: "editor", spellcheck: "false", autocomplete: "off", autocorrect: "off", autocapitalize: "off", "aria-label": "Tu consulta SQL", placeholder: estado.libreEsq === "nba" ? "SELECT * FROM jugadores" : "SELECT * FROM clientes" });
-    ed.value = estado.libre || ""; ed.addEventListener("input", function () { estado.libre = ed.value; guardar(); }); ed.addEventListener("keydown", teclas);
-    C.appendChild(el("div", { class: "editor-box" }, ed, el("div", { class: "acciones" }, el("button", { class: "btn primary", type: "button", onclick: correrLibre }, "Ejecutar"), el("span", { class: "sep" }), el("span", { class: "atajo", text: "Ctrl + Enter ejecuta" }))));
-    if (vista.ultimo) C.appendChild(vista.ultimo);
+  /* ---------- Editor con colores y números de línea ---------- */
+  function editorSql(o) {
+    var ta = el("textarea", { id: "editor", spellcheck: "false", autocomplete: "off", autocorrect: "off", autocapitalize: "off", wrap: "off", "aria-label": o.label || "Tu consulta SQL", placeholder: o.placeholder || "" });
+    ta.value = o.valor || "";
+    var pre = el("pre", { class: "sql-capa", "aria-hidden": "true" }), gut = el("div", { class: "gutter", "aria-hidden": "true" });
+    var caja = el("div", { class: "editor-sql" }, gut, el("div", { class: "capa" }, pre, ta));
+    function ajustar() {
+      if (!ta.isConnected) return;
+      ta.style.height = "auto";
+      ta.style.height = (ta.scrollHeight + ta.offsetHeight - ta.clientHeight) + "px";
+      pre.scrollLeft = ta.scrollLeft;
+    }
+    function pintar() {
+      var v = ta.value, n = v.split("\n").length, nums = [];
+      pre.innerHTML = pintarSql(v) + "\n";
+      for (var i = 1; i <= n; i++) nums.push(i);
+      gut.textContent = nums.join("\n");
+      ta.rows = Math.max(o.min || 8, n);
+      ajustar();
+    }
+    ta.addEventListener("input", pintar);
+    ta.addEventListener("scroll", function () { pre.scrollLeft = ta.scrollLeft; pre.scrollTop = ta.scrollTop; });
+    ta.refrescar = pintar;
+    pintar();
+    requestAnimationFrame(ajustar);
+    return { caja: caja, ta: ta };
   }
-  function correrLibre() {
-    var q = $("#editor").value, caja = el("div", { style: "display:flex;flex-direction:column;gap:12px" });
-    try { var r = usuario(estado.libreEsq, q); caja.appendChild(el("div", { class: "res-head" }, el("h3", { text: "Resultado" }), el("span", { class: "muted", text: nFilas(r.filas.length) }))); caja.appendChild(tabla(r, null, { alta: true })); }
-    catch (z) { caja.appendChild(cajaError(z.message || String(z))); }
-    vista.ultimo = caja; pintarContenido(); $("#editor").focus();
+  function insertar(ta, txt) {
+    if (!ta) return;
+    var a = ta.selectionStart, b = ta.selectionEnd, v = ta.value, antes = v.slice(0, a);
+    if (/\n/.test(txt)) { if (antes && !/\n[ \t]*$/.test(antes)) txt = "\n" + txt; }
+    else if (antes && !/[\s(.,]$/.test(antes)) txt = " " + txt;
+    ta.value = antes + txt + v.slice(b);
+    ta.selectionStart = ta.selectionEnd = a + txt.length;
+    ta.dispatchEvent(new Event("input"));
+    ta.focus();
+  }
+
+  /* ---------- Pizarra libre: consola ---------- */
+  function hora() { var d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+  function agregarHist(q, k, st) {
+    var limpio = String(q || "").trim(); if (!limpio) return;
+    var h = (estado.hist || []).filter(function (x) { return !(x.q === limpio && x.k === k); });
+    h.unshift({ q: limpio, k: k, st: st, h: hora() });
+    estado.hist = h.slice(0, 15);
+    guardarLocal();
+  }
+  function cargarHist(x) {
+    var ta = $("#editor"), actual = ta ? ta.value.trim() : "";
+    if (actual && !(estado.hist || []).some(function (y) { return y.q === actual; })) agregarHist(actual, estado.libreEsq, "sin ejecutar");
+    estado.libreEsq = x.k; estado.libre = x.q; vista.histAbierto = false; vista.ultimo = null;
+    guardar(); pintarContenido();
+    var nt = $("#editor"); if (nt) { nt.focus(); nt.selectionStart = nt.selectionEnd = nt.value.length; }
+  }
+  function pintarHist() {
+    var H = $("#hist"), b = $("#hist-btn"), h = estado.hist || [];
+    if (b) { b.textContent = "Historial (" + h.length + ")"; b.setAttribute("aria-expanded", vista.histAbierto ? "true" : "false"); }
+    if (!H) return;
+    H.textContent = ""; H.hidden = !vista.histAbierto;
+    if (!vista.histAbierto) return;
+    if (!h.length) { H.appendChild(el("p", { class: "muted", text: "Todavía no ejecutas nada. Aquí quedan tus últimas 15 consultas; click en una la vuelve a poner en el editor." })); return; }
+    h.forEach(function (x) {
+      var corta = x.q.replace(/\s+/g, " ");
+      H.appendChild(el("button", { class: "hist-item", type: "button", title: "Volver a poner esta consulta en el editor", onclick: function () { cargarHist(x); } },
+        el("code", { text: corta.length > 120 ? corta.slice(0, 120) + "…" : corta }),
+        el("span", { class: "muted", text: (x.k === "nba" ? "NBA" : "Banco") + " · " + x.st + " · " + x.h })));
+    });
+  }
+  function arbolTablas(k, ta, mapa) {
+    var info = infoTablas(k), abiertas = vista.arbol[k] || (vista.arbol[k] = {});
+    var A = el("aside", { class: "arbol", "aria-label": "Tablas" });
+    var seg = el("div", { class: "seg", role: "group", "aria-label": "Qué tablas usar" });
+    [["nba", "NBA"], ["banco", "Banco"]].forEach(function (p) {
+      seg.appendChild(el("button", { type: "button", "aria-pressed": k === p[0] ? "true" : "false", onclick: function () { if (estado.libreEsq === p[0]) return; estado.libreEsq = p[0]; vista.ultimo = null; guardar(); pintarContenido(); } }, p[1]));
+    });
+    A.appendChild(seg);
+    A.appendChild(el("p", { class: "arbol-ayuda", text: "Click en un nombre y se escribe en el editor. La flecha muestra las columnas." }));
+    var lista = el("ul", { class: "arbol-lista" });
+    TABLAS[k].forEach(function (t) {
+      var it = info[t.nombre], ab = !!abiertas[t.nombre], li = el("li", { class: ab ? "abierta" : null });
+      li.appendChild(el("div", { class: "arbol-t" },
+        el("button", { class: "chev", type: "button", "aria-expanded": ab ? "true" : "false", "aria-label": (ab ? "Ocultar" : "Ver") + " las columnas de " + t.nombre, onclick: function () { abiertas[t.nombre] = !abiertas[t.nombre]; A.replaceWith(arbolTablas(k, ta, mapa)); } }, "▸"),
+        el("button", { class: "nodo", type: "button", title: "Escribir «" + t.nombre + "» en el editor", onclick: function () { insertar(ta, t.nombre); } }, t.nombre),
+        el("span", { class: "n", title: nFilas(it.n), text: String(it.n) })));
+      if (ab) {
+        var cols = el("ul", { class: "arbol-cols" });
+        it.cols.forEach(function (c) {
+          cols.appendChild(el("li", null, el("button", { type: "button", title: "Escribir «" + c.nombre + "» en el editor" + (c.fk ? ". Apunta a " + c.fk.pt + "." + c.fk.pc : ""), onclick: function () { insertar(ta, c.nombre); } },
+            el("span", { class: "cn", text: c.nombre }), c.pk ? pill("PK") : c.fk ? pill("FK") : null, el("span", { class: "tipo", text: c.tipo.toLowerCase() }))));
+        });
+        cols.appendChild(el("li", null, el("button", { type: "button", class: "previa", onclick: function () { correrLibre(t.nombre); } }, "Ver sus filas")));
+        li.appendChild(cols);
+      }
+      lista.appendChild(li);
+    });
+    A.appendChild(lista);
+    A.appendChild(el("button", { class: "btn small ver-mapa", type: "button", onclick: function () { mapa.open = true; mapa.scrollIntoView({ behavior: "smooth", block: "start" }); } }, "Ver el mapa de relaciones"));
+    return A;
+  }
+  function pintarLibre(C) {
+    var k = estado.libreEsq;
+    C.appendChild(el("div", { class: "enun" }, el("h2", { text: "Pizarra libre" }),
+      el("p", { class: "texto", text: "Una consola como la de BigQuery para probar lo que quieras sobre las tablas. Lo que ejecutas queda en el historial." })));
+    var ed = editorSql({ valor: estado.libre || "", placeholder: k === "nba" ? "SELECT * FROM jugadores" : "SELECT * FROM clientes", min: 9 }), ta = ed.ta;
+    ta.addEventListener("input", function () { estado.libre = ta.value; guardar(); });
+    ta.addEventListener("keydown", teclas);
+    var mapa = panelTablas(k, { ctx: "libre", id: "mapa-libre", alInsertar: function (s) { insertar(ta, s); } });
+    C.appendChild(mapa);
+    var cons = el("div", { class: "consola" + (vista.arbolMovil ? "" : " arbol-cerrado") });
+    var barra = el("div", { class: "barra" },
+      el("button", { class: "btn small solo-movil", type: "button", "aria-expanded": vista.arbolMovil ? "true" : "false", onclick: function (ev) { vista.arbolMovil = !vista.arbolMovil; cons.classList.toggle("arbol-cerrado", !vista.arbolMovil); ev.currentTarget.setAttribute("aria-expanded", vista.arbolMovil ? "true" : "false"); } }, "Tablas"),
+      el("button", { class: "btn primary", type: "button", onclick: function () { correrLibre(); } }, "▶ Ejecutar"),
+      el("span", { class: "atajo", text: "Ctrl + Enter" }),
+      el("span", { class: "sep" }),
+      el("span", { class: "chip-esq", text: k === "nba" ? "Tablas NBA" : "Tablas del banco" }),
+      el("button", { class: "btn small", id: "hist-btn", type: "button", "aria-controls": "hist", onclick: function () { vista.histAbierto = !vista.histAbierto; pintarHist(); } }, "Historial"));
+    var main = el("div", { class: "consola-main" }, barra, el("div", { class: "hist", id: "hist", hidden: true }), ed.caja, el("div", { class: "libre-res", id: "libre-res", "aria-live": "polite" }));
+    cons.appendChild(arbolTablas(k, ta, mapa));
+    cons.appendChild(main);
+    C.appendChild(cons);
+    pintarHist(); pintarResLibre();
+  }
+  function pintarResLibre() {
+    var R = $("#libre-res"); if (!R) return;
+    R.textContent = "";
+    R.appendChild(vista.ultimo || el("p", { class: "res-vacio", text: "El resultado aparece aquí." }));
+  }
+  function correrLibre(previa) {
+    var ta = $("#editor"); if (!SQL || !ta) return;
+    var k = estado.libreEsq, q = previa ? "SELECT * FROM " + previa : ta.value, caja = el("div", { class: "res-libre" }), r = null, err = null, t0 = performance.now();
+    try { r = usuario(k, q); } catch (z) { err = z.message || String(z); }
+    var ms = Math.max(1, Math.round(performance.now() - t0));
+    if (err) caja.appendChild(cajaError(err));
+    else {
+      caja.appendChild(el("div", { class: "res-head" }, el("h3", { text: previa ? "Filas de " + previa : "Resultado" }), el("span", { class: "muted", text: nFilas(r.filas.length) + " · " + ms + " ms" + (previa ? " · no queda en el historial" : "") })));
+      caja.appendChild(tabla(r, null, { alta: true }));
+    }
+    if (!previa && err !== "vacia") agregarHist(q, k, err ? "error" : nFilas(r.filas.length));
+    vista.ultimo = caja; pintarResLibre(); pintarHist();
+    if (!previa) ta.focus();
   }
 
   /* ---------- Contenido ---------- */
@@ -2283,7 +2644,7 @@ HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');
     if (v.tab === "referencia") return pintarReferencia(C);
     if (v.tab === "libre") return pintarLibre(C);
     var m = modulo(v.mod);
-    C.appendChild(panelTablas(m.esq, false));
+    C.appendChild(panelTablas(m.esq, { ctx: "tema" }));
     if (v.tipo === "apr") pintarAprender(C, m);
     else { var x = buscar(v.id); if (x) pintarEjercicio(C, x); }
   }
