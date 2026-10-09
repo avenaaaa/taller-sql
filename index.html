@@ -1,0 +1,2431 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Taller de SQL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: banco de trabajo. Arriba las pestañas; debajo, los temas a la izquierda y la lección o el ejercicio a la derecha. En pantalla angosta los temas se pliegan arriba. Datos: NBA 2015-16. */
+:root {
+  --bg: #F1F5F4; --surface: #FFFFFF; --sunken: #E8EEED; --ink: #14262A; --muted: #556A6E; --line: #D3DDDC;
+  --accent: #0B6A6A; --accent-ink: #FFFFFF; --accent-soft: #DCEEEC;
+  --key: #8A5300; --key-bg: #FCEBC0; --key-line: #E3B54A;
+  --nul: #6A4A8C; --nul-bg: #ECE5F4;
+  --ok: #19704A; --ok-bg: #DFF2E7; --bad: #A93226; --bad-bg: #FBE6E2; --warn: #7A5A00; --warn-bg: #FBF0CC;
+  --editor: #FBFDFC;
+  --bq: #1F5FA8; --bq-bg: #E1ECF9; --kw: #0B6A6A; --fn: #7A4A9E; --str: #9A4B12; --numc: #1F5FA8; --com: #7A8B8E;
+  --display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0D191B; --surface: #142326; --sunken: #0F1D20; --ink: #E3EDED; --muted: #93A8AB; --line: #263A3E;
+  --accent: #5CC9C2; --accent-ink: #062021; --accent-soft: #173537;
+  --key: #F3C55A; --key-bg: #3A2E10; --key-line: #7A6220;
+  --nul: #C6ADE4; --nul-bg: #2A2238;
+  --ok: #73D4A0; --ok-bg: #122E22; --bad: #F28B80; --bad-bg: #3A1916; --warn: #F0CF6B; --warn-bg: #33290C;
+  --bq: #8FBDF2; --bq-bg: #142B45; --kw: #5CC9C2; --fn: #C6ADE4; --str: #F0B27A; --numc: #8FBDF2; --com: #7D9194;
+  --editor: #0A1517; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0D191B; --surface: #142326; --sunken: #0F1D20; --ink: #E3EDED; --muted: #93A8AB; --line: #263A3E;
+  --accent: #5CC9C2; --accent-ink: #062021; --accent-soft: #173537;
+  --key: #F3C55A; --key-bg: #3A2E10; --key-line: #7A6220;
+  --nul: #C6ADE4; --nul-bg: #2A2238;
+  --ok: #73D4A0; --ok-bg: #122E22; --bad: #F28B80; --bad-bg: #3A1916; --warn: #F0CF6B; --warn-bg: #33290C;
+  --bq: #8FBDF2; --bq-bg: #142B45; --kw: #5CC9C2; --fn: #C6ADE4; --str: #F0B27A; --numc: #8FBDF2; --com: #7D9194;
+  --editor: #0A1517; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 56px; display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; line-height: 1.15; }
+h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 21px; font-weight: 700; }
+h3 { font-size: 15px; font-weight: 700; font-family: var(--body); }
+p { margin: 0; }
+code, .mono { font-family: var(--mono); font-size: 0.92em; }
+code { background: var(--sunken); padding: 1px 5px; border-radius: 4px; }
+.eyebrow { font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.muted { color: var(--muted); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, textarea:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 7px 13px; border-radius: var(--r); font-weight: 500; font-size: 14px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.btn.small { padding: 4px 9px; font-size: 13px; }
+.btn.ghost { background: transparent; }
+
+/* Cabecera */
+.top { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-end; justify-content: space-between; }
+.top .lead { max-width: 60ch; color: var(--muted); margin-top: 6px; }
+.top-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.timer { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.timer.on { border-color: var(--accent); color: var(--accent); }
+.timer.fin { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+.avance { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.avance b { color: var(--ink); }
+.nube { font-size: 12.5px; color: var(--muted); flex: 1 1 100%; text-align: right; }
+.nube.ok { color: var(--ok); } .nube.error { color: var(--warn); }
+.aviso { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); border-radius: var(--r); padding: 10px 14px; font-weight: 500; }
+
+/* Mapa de llaves */
+.mapa { display: flex; flex-direction: column; gap: 12px; }
+.mapa-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; }
+.mapa-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 0; align-items: stretch; }
+.tabla-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tabla-card .nom { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; justify-content: space-between; }
+.tabla-card .nom b { font-family: var(--mono); font-size: 16px; }
+.tabla-card .alias { font-size: 12.5px; color: var(--muted); }
+.tabla-card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+.tabla-card li { font-family: var(--mono); font-size: 13px; padding: 2px 7px; border-radius: 4px; background: var(--sunken); }
+.tabla-card li.llave { background: var(--key-bg); color: var(--key); box-shadow: inset 0 0 0 1px var(--key-line); font-weight: 600; }
+.tabla-card .nota { font-size: 13px; color: var(--muted); }
+.tabla-card .btn { align-self: flex-start; }
+.enlace { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0 6px; min-width: 96px; }
+.enlace .linea { width: 100%; height: 0; border-top: 2px dashed var(--key-line); }
+.enlace span { font-family: var(--mono); font-size: 12.5px; font-weight: 600; color: var(--key); background: var(--key-bg); padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+.filas-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Banco */
+.banco { display: grid; grid-template-columns: 272px minmax(0, 1fr); gap: 22px; align-items: start; }
+.lista { display: flex; flex-direction: column; gap: 16px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
+.nivel { display: flex; flex-direction: column; gap: 4px; }
+.nivel > .eyebrow { display: flex; justify-content: space-between; gap: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--line); margin-bottom: 2px; }
+.ej-btn { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; align-items: baseline; text-align: left; border: 0; background: transparent; padding: 5px 8px; border-radius: var(--r); font-size: 14px; }
+.ej-btn:hover { background: var(--sunken); }
+.ej-btn[aria-current="true"] { background: var(--accent-soft); font-weight: 600; }
+.marca { font-family: var(--mono); font-size: 13px; font-weight: 600; text-align: center; color: var(--muted); }
+.marca.sola { color: var(--ok); } .marca.conpista { color: var(--warn); } .marca.recon { color: var(--accent); } .marca.intento { color: var(--bad); }
+.leyenda { font-size: 12.5px; color: var(--muted); display: grid; grid-template-columns: 18px 1fr; gap: 2px 8px; }
+.cierre { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; }
+.cierre .btn { align-self: flex-start; }
+.resumen { width: 100%; min-height: 150px; font-family: var(--mono); font-size: 12px; background: var(--editor); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; }
+
+.mesa { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.enun { display: flex; flex-direction: column; gap: 8px; }
+.enun .meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.chip { font-size: 12.5px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.chip.estado { background: var(--sunken); color: var(--muted); }
+.chip.estado.sola { background: var(--ok-bg); color: var(--ok); } .chip.estado.conpista { background: var(--warn-bg); color: var(--warn); } .chip.estado.recon { background: var(--accent-soft); color: var(--accent); }
+.enun h2 { max-width: 34ch; }
+.enun .texto { font-size: 17px; max-width: 66ch; }
+.enun .cols { font-size: 14px; color: var(--muted); }
+.intro { font-size: 14px; color: var(--muted); max-width: 72ch; border-left: 3px solid var(--line); padding-left: 12px; }
+.editor-box { display: flex; flex-direction: column; gap: 8px; }
+#editor { width: 100%; min-height: 170px; resize: vertical; font-family: var(--mono); font-size: 14.5px; line-height: 1.55; background: var(--editor); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; tab-size: 2; }
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.acciones .sep { flex: 1 1 auto; }
+.atajo { font-size: 12.5px; color: var(--muted); }
+.veredicto { border-radius: var(--r); padding: 10px 14px; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.veredicto.ok { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+.veredicto.mal { background: var(--bad-bg); border-color: var(--bad); }
+.veredicto.info { background: var(--warn-bg); border-color: var(--warn); }
+.veredicto .tit { font-weight: 600; }
+.veredicto.mal .tit { color: var(--bad); }
+.veredicto.info .tit { color: var(--warn); }
+.veredicto .orig { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.dif { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.dif > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dif .eyebrow { color: var(--ink); }
+.ayuda { background: var(--warn-bg); border-left: 3px solid var(--warn); padding: 8px 12px; border-radius: 0 var(--r) var(--r) 0; font-size: 14.5px; }
+.ayuda b { color: var(--warn); }
+.res-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+
+/* Tablas de resultados */
+.t-scroll { overflow-x: auto; width: fit-content; max-width: 100%; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.t-scroll.alta { max-height: 420px; overflow-y: auto; }
+table.res { border-collapse: collapse; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+table.res th, table.res td { padding: 4px 10px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--line); }
+table.res th { position: sticky; top: 0; background: var(--sunken); font-weight: 600; font-size: 12.5px; }
+table.res tr:last-child td { border-bottom: 0; }
+table.res td.num { text-align: right; }
+table.res th.k, table.res td.k { background: var(--key-bg); color: var(--key); }
+table.res td.k { font-weight: 600; }
+table.res td.nul, table.res td.nul.k { background: var(--nul-bg); color: var(--nul); font-style: italic; font-weight: 500; }
+.vacio { padding: 10px 12px; font-size: 14px; color: var(--muted); }
+
+/* Solución */
+.solucion { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.solucion pre { margin: 0; font-family: var(--mono); font-size: 14px; line-height: 1.55; background: var(--editor); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; overflow-x: auto; }
+.pasos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; counter-reset: paso; }
+.pasos li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; counter-increment: paso; }
+.pasos li::before { content: counter(paso); font-family: var(--mono); font-weight: 600; font-size: 13px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+.paso-c { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.paso-c .pt { font-family: var(--mono); font-weight: 600; font-size: 14px; }
+.paso-c .pd { font-size: 14.5px; max-width: 70ch; }
+.paso-c .pn { font-size: 12.5px; color: var(--muted); }
+.ojo { background: var(--bad-bg); border-left: 3px solid var(--bad); border-radius: 0 var(--r) var(--r) 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; font-size: 14.5px; }
+.ojo .eyebrow { color: var(--bad); }
+.nav { display: flex; justify-content: space-between; gap: 12px; }
+.pie { font-size: 13px; color: var(--muted); max-width: 80ch; border-top: 1px solid var(--line); padding-top: 14px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 860px) {
+  .banco { grid-template-columns: minmax(0, 1fr); }
+  .mesa { order: 1; } .lista { order: 2; border-top: 1px solid var(--line); padding-top: 16px; }
+  .lista { position: static; max-height: none; overflow: visible; padding-right: 0; }
+  .mapa-grid { grid-template-columns: minmax(0, 1fr); }
+  .enlace { flex-direction: row; padding: 6px 0; min-width: 0; }
+  .enlace .linea { width: 0; height: 18px; border-top: 0; border-left: 2px dashed var(--key-line); }
+  h1 { font-size: 25px; }
+}
+@media (max-width: 480px) { .wrap { padding-inline: 16px; } .enun .texto { font-size: 16px; } }
+@media (prefers-reduced-motion: no-preference) { .btn, .ej-btn { transition: background-color .12s, border-color .12s; } }
+
+/* ---- v3: pestañas, temas, lecciones ---- */
+.pestanas { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); }
+.pestanas button { border: 0; background: transparent; padding: 9px 14px; font-weight: 600; font-size: 14.5px; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.pestanas button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.pestanas button:hover { color: var(--ink); }
+.nav-toggle { display: none; }
+.modulo { display: flex; flex-direction: column; gap: 2px; }
+.modulo-btn { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; width: 100%; text-align: left; border: 0; background: transparent; padding: 6px 8px; border-radius: var(--r); font-weight: 600; font-size: 14px; }
+.modulo-btn:hover { background: var(--sunken); }
+.modulo-btn .cuenta { font-size: 12px; color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.modulo.abierto > .modulo-btn { color: var(--accent); }
+.modulo-items { display: flex; flex-direction: column; gap: 1px; padding-left: 8px; border-left: 2px solid var(--line); margin-left: 8px; margin-bottom: 6px; }
+.grupo-nom { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 8px 8px 2px; }
+.tablas-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; }
+.tablas-panel > summary { cursor: pointer; font-weight: 600; font-size: 14.5px; }
+.tablas-panel[open] > summary { margin-bottom: 10px; }
+.conexiones { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.conexiones code { background: var(--key-bg); color: var(--key); font-weight: 600; font-size: 12.5px; }
+.tchips { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.tchip { border: 1px solid var(--line); border-radius: var(--r); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; min-width: 0; background: var(--bg); }
+.tchip .nom { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.tchip .nom b { font-family: var(--mono); font-size: 14px; }
+.tchip .cols { font-family: var(--mono); font-size: 12px; color: var(--muted); line-height: 1.6; }
+.tchip .cols .llave { color: var(--key); background: var(--key-bg); padding: 0 4px; border-radius: 3px; font-weight: 600; }
+.tchip p { font-size: 12.5px; color: var(--muted); }
+.tchip .btn { align-self: flex-start; }
+.filas-tabla { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+
+.leccion { display: flex; flex-direction: column; gap: 22px; }
+.ejemplo { display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; border-bottom: 1px solid var(--line); min-width: 0; }
+.ejemplo header { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.ejemplo header h3 { font-family: var(--display); font-size: 18px; }
+.ejemplo header p { flex: 1 1 100%; color: var(--muted); font-size: 14.5px; }
+.bq { font-size: 12px; font-weight: 600; color: var(--bq); background: var(--bq-bg); padding: 1px 8px; border-radius: 999px; }
+pre.sql { margin: 0; font-family: var(--mono); font-size: 13.5px; line-height: 1.55; background: var(--editor); border: 1px solid var(--line); border-radius: var(--r); padding: 11px 13px; overflow-x: auto; }
+.kw { color: var(--kw); font-weight: 600; } .fn { color: var(--fn); } .str { color: var(--str); } pre.sql .num { color: var(--numc); } .com { color: var(--com); font-style: italic; }
+.predice { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; background: var(--accent-soft); border-radius: var(--r); padding: 10px 14px; }
+.predice p { flex: 1 1 260px; font-size: 14.5px; }
+.predice p b { color: var(--accent); }
+.revelado { display: flex; flex-direction: column; gap: 10px; }
+.t-tit { font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.ojo-nota { font-size: 14.5px; max-width: 78ch; padding-left: 12px; border-left: 3px solid var(--key-line); }
+.motor { border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
+.con-error { background: var(--bad-bg); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.con-error .t-tit { color: var(--bad); }
+.err-caja { color: var(--bad); border: 1px solid var(--bad); border-radius: var(--r); background: var(--surface); padding: 7px 10px; font-size: 13px; width: fit-content; }
+.cierre-leccion { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.par { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.ref-ficha { display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid var(--line); min-width: 0; }
+.ref-sec { display: flex; flex-direction: column; gap: 16px; }
+.ref-sec > h2 { padding-bottom: 6px; border-bottom: 2px solid var(--ink); }
+#buscar { width: 100%; max-width: 420px; font: inherit; font-size: 14px; padding: 7px 10px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--ink); }
+table.ref { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.ref th, table.ref td { padding: 8px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+table.ref th { background: var(--sunken); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+table.ref tr:last-child td { border-bottom: 0; }
+table.ref code { white-space: nowrap; }
+table.ref code.rojo { background: var(--bad-bg); color: var(--bad); }
+.t-scroll.ancha { width: auto; }
+.orden-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.orden-chips span { font-family: var(--mono); font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+.orden-chips span em { font-style: normal; font-family: var(--body); font-weight: 400; color: var(--ink); margin-left: 6px; }
+.orden-chips i { font-style: normal; color: var(--muted); }
+select#libre-esq { font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--ink); }
+@media (max-width: 860px) {
+  .nav-toggle { display: inline-flex; }
+  .lista.cerrada > :not(.nav-toggle) { display: none; }
+  .par { grid-template-columns: minmax(0, 1fr); }
+}
+
+.orden { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.banco.solo { grid-template-columns: minmax(0, 1fr); }
+.mesa { min-width: 0; }
+@media (max-width: 860px) { .mesa { order: 2; } .lista { order: 1; border-top: 0; padding-top: 0; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">SQL con datos reales de la NBA 2015-16</p>
+      <h1>Taller de SQL</h1>
+      <p class="lead">Primero aprendes con ejemplos resueltos, prediciendo el resultado antes de mirarlo. Después practicas con ejercicios que se comprueban solos.</p>
+    </div>
+    <div class="top-tools">
+      <span class="avance" id="avance"></span>
+      <button class="btn" id="copiar" type="button">Copiar resumen para Claude</button>
+      <button class="btn timer" id="timer" type="button" title="Bloque de foco de 25 minutos">Timer 25:00</button>
+      <span class="nube" id="nube" role="status"></span>
+    </div>
+  </header>
+  <textarea id="resumen" class="resumen" readonly hidden aria-label="Resumen de la sesión"></textarea>
+  <div class="aviso" id="aviso-timer" hidden>Sonó el timer. Escribe una línea con lo que ibas a hacer después y para 5 minutos, sin pantallas.</div>
+  <div class="aviso" id="aviso-motor" hidden></div>
+
+  <nav class="pestanas" id="pestanas" role="tablist" aria-label="Secciones del taller"></nav>
+
+  <div class="banco" id="banco">
+    <nav class="lista" id="lista" aria-label="Temas y ejercicios"></nav>
+    <main class="mesa" id="contenido"></main>
+  </div>
+
+  <p class="pie">Los datos son reales: récords, promedios por partido y premios de la temporada 2015-16, y los puntos de cada partido de la final de 2016, tomados de basketball-reference.com y nba.com. La única tabla inventada es carga_puntos, que simula una carga con errores. El motor es SQLite y corre dentro de tu navegador; JOIN, GROUP BY, HAVING, NULL, CASE, subconsultas, CTE y ventanas se escriben igual en BigQuery, y las funciones de fecha se muestran con su sintaxis de BigQuery.</p>
+</div>
+
+<script src="sql-asm.js"></script>
+<script>
+/* Datos reales de la temporada 2015-16 de la NBA y de la final de 2016.
+   Fuentes: basketball-reference.com (promedios por jugador, récords, marcadores y box scores de la final)
+   y official.nba.com (premios). Verificados el 8 de octubre de 2026.
+   La tabla carga_puntos es la única inventada: simula una carga con filas repetidas. */
+const ESQUEMA_NBA = `
+CREATE TABLE equipos (equipo_id TEXT, nombre TEXT, conferencia TEXT, victorias INTEGER, derrotas INTEGER);
+INSERT INTO equipos VALUES
+ ('GSW','Golden State Warriors','Oeste',73,9),
+ ('SAS','San Antonio Spurs','Oeste',67,15),
+ ('OKC','Oklahoma City Thunder','Oeste',55,27),
+ ('LAC','Los Angeles Clippers','Oeste',53,29),
+ ('POR','Portland Trail Blazers','Oeste',44,38),
+ ('DAL','Dallas Mavericks','Oeste',42,40),
+ ('HOU','Houston Rockets','Oeste',41,41),
+ ('SAC','Sacramento Kings','Oeste',33,49),
+ ('NOP','New Orleans Pelicans','Oeste',30,52),
+ ('MIN','Minnesota Timberwolves','Oeste',29,53),
+ ('LAL','Los Angeles Lakers','Oeste',17,65),
+ ('CLE','Cleveland Cavaliers','Este',57,25),
+ ('TOR','Toronto Raptors','Este',56,26),
+ ('BOS','Boston Celtics','Este',48,34),
+ ('IND','Indiana Pacers','Este',45,37),
+ ('MIL','Milwaukee Bucks','Este',33,49),
+ ('NYK','New York Knicks','Este',32,50),
+ ('PHI','Philadelphia 76ers','Este',10,72);
+CREATE TABLE jugadores (jugador_id INTEGER, nombre TEXT, equipo_id TEXT, posicion TEXT, universidad TEXT);
+INSERT INTO jugadores VALUES
+ (1,'Stephen Curry','GSW','PG','Davidson'),
+ (2,'Klay Thompson','GSW','SG','Washington State'),
+ (3,'Draymond Green','GSW','PF','Michigan State'),
+ (4,'LeBron James','CLE','SF',NULL),
+ (5,'Kyrie Irving','CLE','PG','Duke'),
+ (6,'Kevin Love','CLE','PF','UCLA'),
+ (7,'Kevin Durant','OKC','SF','Texas'),
+ (8,'Russell Westbrook','OKC','PG','UCLA'),
+ (9,'Kawhi Leonard','SAS','SF','San Diego State'),
+ (10,'James Harden','HOU','SG','Arizona State'),
+ (11,'DeMar DeRozan','TOR','SG','USC'),
+ (12,'Kyle Lowry','TOR','PG','Villanova'),
+ (13,'Chris Paul','LAC','PG','Wake Forest'),
+ (14,'Jamal Crawford','LAC','SG','Michigan'),
+ (15,'Damian Lillard','POR','PG','Weber State'),
+ (16,'CJ McCollum','POR','SG','Lehigh'),
+ (17,'Anthony Davis','NOP','C','Kentucky'),
+ (18,'Kobe Bryant','LAL','SF',NULL),
+ (19,'Giannis Antetokounmpo','MIL','PG',NULL),
+ (20,'Dirk Nowitzki','DAL','PF',NULL),
+ (21,'Kristaps Porzingis','NYK','PF',NULL),
+ (22,'Karl-Anthony Towns','MIN','C','Kentucky'),
+ (23,'DeMarcus Cousins','SAC','C','Kentucky'),
+ (24,'Paul George','IND','SF','Fresno State');
+CREATE TABLE estadisticas (jugador_id INTEGER, temporada TEXT, partidos INTEGER, puntos REAL, rebotes REAL, asistencias REAL);
+INSERT INTO estadisticas VALUES
+ (1,'2015-16',79,30.1,5.4,6.7),(2,'2015-16',80,22.1,3.8,2.1),(3,'2015-16',81,14.0,9.5,7.4),
+ (4,'2015-16',76,25.3,7.4,6.8),(5,'2015-16',53,19.6,3.0,4.7),(6,'2015-16',77,16.0,9.9,2.4),
+ (7,'2015-16',72,28.2,8.2,5.0),(8,'2015-16',80,23.5,7.8,10.4),(9,'2015-16',72,21.2,6.8,2.6),
+ (10,'2015-16',82,29.0,6.1,7.5),(11,'2015-16',78,23.5,4.5,4.0),(12,'2015-16',77,21.2,4.7,6.4),
+ (13,'2015-16',74,19.5,4.2,10.0),(14,'2015-16',79,14.2,1.8,2.3),(15,'2015-16',75,25.1,4.0,6.8),
+ (16,'2015-16',80,20.8,3.2,4.3),(17,'2015-16',61,24.3,10.3,1.9),(18,'2015-16',66,17.6,3.7,2.8),
+ (19,'2015-16',80,16.9,7.7,4.3),(20,'2015-16',75,18.3,6.5,1.8),(21,'2015-16',72,14.3,7.3,1.3),
+ (22,'2015-16',82,18.3,10.5,2.0),(23,'2015-16',65,26.9,11.5,3.3),(24,'2015-16',81,23.1,7.0,4.1);
+CREATE TABLE premios (premio TEXT, temporada TEXT, jugador_id INTEGER);
+INSERT INTO premios VALUES
+ ('MVP','2015-16',1),('Mejor defensor','2015-16',9),('Novato del año','2015-16',22),
+ ('Sexto hombre','2015-16',14),('Jugador de mayor progreso','2015-16',16),('MVP de las Finales','2015-16',4);
+CREATE TABLE finales (partido INTEGER, fecha TEXT, local TEXT, puntos_gsw INTEGER, puntos_cle INTEGER);
+INSERT INTO finales VALUES
+ (1,'2016-06-02','GSW',104,89),(2,'2016-06-05','GSW',110,77),(3,'2016-06-08','CLE',90,120),
+ (4,'2016-06-10','CLE',108,97),(5,'2016-06-13','GSW',97,112),(6,'2016-06-16','CLE',101,115),
+ (7,'2016-06-19','GSW',89,93);
+CREATE TABLE puntos_finales (jugador_id INTEGER, partido INTEGER, puntos INTEGER);
+INSERT INTO puntos_finales VALUES
+ (4,1,23),(4,2,19),(4,3,32),(4,4,25),(4,5,41),(4,6,41),(4,7,27),
+ (5,1,26),(5,2,10),(5,3,30),(5,4,34),(5,5,41),(5,6,23),(5,7,26),
+ (6,1,17),(6,2,5),(6,4,11),(6,5,2),(6,6,7),(6,7,9),
+ (1,1,11),(1,2,18),(1,3,19),(1,4,38),(1,5,25),(1,6,30),(1,7,17),
+ (2,1,9),(2,2,17),(2,3,10),(2,4,25),(2,5,37),(2,6,25),(2,7,14),
+ (3,1,16),(3,2,28),(3,3,6),(3,4,9),(3,6,8),(3,7,32);
+CREATE TABLE carga_puntos (jugador_id INTEGER, partido INTEGER, puntos INTEGER, cargado_el TEXT);
+INSERT INTO carga_puntos VALUES
+ (4,6,41,'2016-06-17 08:00'),(4,7,27,'2016-06-20 08:00'),(1,6,30,'2016-06-17 08:00'),
+ (1,7,17,'2016-06-20 08:00'),(4,7,27,'2016-06-20 08:00'),(1,7,17,'2016-06-20 09:30'),
+ (5,7,26,'2016-06-20 08:00');
+`;
+const TABLAS_NBA = [
+  { nombre: "equipos", alias: "e", llaves: ["equipo_id"], nota: "Los 18 equipos de la tabla, con su récord 2015-16. Boston y Filadelfia no tienen jugadores en la tabla." },
+  { nombre: "jugadores", alias: "j", llaves: ["jugador_id", "equipo_id"], nota: "24 jugadores y su equipo en 2015-16. universidad es NULL para los que llegaron a la NBA sin pasar por la universidad." },
+  { nombre: "estadisticas", alias: "s", llaves: ["jugador_id"], nota: "Promedios por partido de la temporada 2015-16. Una fila por jugador." },
+  { nombre: "premios", alias: "p", llaves: ["jugador_id"], nota: "Los premios 2015-16 y quién los ganó." },
+  { nombre: "finales", alias: "f", llaves: ["partido"], nota: "Los 7 partidos de la final 2016, Warriors contra Cavaliers." },
+  { nombre: "puntos_finales", alias: "pf", llaves: ["jugador_id", "partido"], nota: "Puntos de seis jugadores en cada partido de la final. Kevin Love no jugó el 3 y Draymond Green estuvo suspendido en el 5: esas filas no existen." },
+  { nombre: "carga_puntos", alias: "c", llaves: ["jugador_id", "partido"], nota: "Inventada: simula una carga de datos con filas repetidas. Solo para la lección de duplicados." }
+];
+const CONEXIONES_NBA = [
+  "jugadores.equipo_id = equipos.equipo_id",
+  "estadisticas.jugador_id = jugadores.jugador_id",
+  "premios.jugador_id = jugadores.jugador_id",
+  "puntos_finales.jugador_id = jugadores.jugador_id",
+  "puntos_finales.partido = finales.partido"
+];
+
+/* Lecciones (aprender) y ejercicios (practicar) sobre los datos NBA 2015-16.
+   Ejemplo: t título · p para qué · pregunta (para predecir antes de ver) · sql · run (si se ejecuta distinto: sintaxis de BigQuery)
+            bq · hl columnas resaltadas · bool columnas 1/0 que se muestran true/false · ojo · mal {sql, run, nota, hl} · pasos [{t,d,q,hl}]
+   Ejercicio: id · titulo · practica · enunciado · columnas · orden (true si el orden de las filas importa) · pistas · sol · pasos · ojo · mal */
+const MODULOS_NBA = [
+  {
+    id: "m1", titulo: "Lo básico",
+    intro: "Elegir columnas, filtrar filas y ordenar. SELECT dice qué columnas, FROM de qué tabla, WHERE qué filas, ORDER BY en qué orden.",
+    aprender: [
+      { id: "a1-1", t: "SELECT, FROM, WHERE y ORDER BY", p: "Las cuatro piezas de casi toda consulta.",
+        pregunta: "¿Cuántos equipos del Este hay en la tabla, y cuál queda primero?",
+        sql: `SELECT nombre, victorias
+FROM equipos
+WHERE conferencia = 'Este'
+ORDER BY victorias DESC;`,
+        ojo: "<code>DESC</code> ordena de mayor a menor. Sin esa palabra el orden es de menor a mayor, y sin ORDER BY el orden de las filas no está garantizado." },
+      { id: "a1-2", t: "Columnas calculadas y alias con AS", p: "Crear una columna nueva a partir de otras y ponerle nombre.",
+        pregunta: "¿Qué diferencia de victorias menos derrotas tienen los Warriors?",
+        sql: `SELECT nombre,
+       victorias - derrotas AS diferencia
+FROM equipos
+ORDER BY diferencia DESC
+LIMIT 3;`,
+        ojo: "El nombre que pones con AS no lleva espacios. Se puede usar en el ORDER BY, pero no en el WHERE: el WHERE corre antes de que exista.",
+        mal: { sql: `SELECT nombre, victorias - derrotas AS diferencia de victorias
+FROM equipos;`, nota: "Error de sintaxis: el motor toma <code>diferencia</code> como el nombre y no sabe qué hacer con las palabras que siguen." } },
+      { id: "a1-3", t: "Los textos distinguen mayúsculas", p: "Un texto se compara letra por letra.",
+        pregunta: "¿Cuántos centros (C) hay?",
+        sql: `SELECT nombre, posicion
+FROM jugadores
+WHERE posicion = 'C';`,
+        mal: { sql: `SELECT nombre, posicion
+FROM jugadores
+WHERE posicion = 'c';`, nota: "No da error: devuelve 0 filas, porque 'c' no es igual a 'C'." } },
+      { id: "a1-4", t: "IN y BETWEEN", p: "Varias opciones para una columna, y un rango.",
+        pregunta: "¿Qué equipos ganaron entre 40 y 50 partidos?",
+        sql: `SELECT nombre, victorias
+FROM equipos
+WHERE victorias BETWEEN 40 AND 50;`,
+        ojo: "BETWEEN incluye los dos extremos. Para varias opciones sueltas se usa IN: <code>WHERE posicion IN ('PF', 'C')</code>." },
+      { id: "a1-5", t: "LIKE: buscar un texto dentro de otro", p: "El signo % significa «cualquier cosa aquí».",
+        pregunta: "¿Cuántos equipos empiezan con «Los Angeles»?",
+        sql: `SELECT nombre
+FROM equipos
+WHERE nombre LIKE 'Los Angeles%';`,
+        ojo: "<code>'Los Angeles%'</code> empieza con eso; <code>'%ers'</code> termina con «ers»; <code>'%City%'</code> lo contiene. Esto es LIKE: no tiene relación con HAVING." },
+      { id: "a1-6", t: "DISTINCT", p: "Los valores distintos de una columna, sin repetir.",
+        pregunta: "¿Cuántas posiciones distintas hay?",
+        sql: `SELECT DISTINCT posicion
+FROM jugadores;` },
+      { id: "a1-7", t: "CASE: una columna según una condición", p: "Escribir un valor u otro dependiendo de cada fila.",
+        pregunta: "¿Quién ganó el partido 3?",
+        sql: `SELECT partido, puntos_gsw, puntos_cle,
+       CASE WHEN puntos_cle > puntos_gsw THEN 'CLE'
+            ELSE 'GSW' END AS ganador
+FROM finales;`, hl: ["ganador"],
+        ojo: "CASE revisa las condiciones en orden y usa la primera que se cumpla; ELSE es lo que queda si ninguna se cumple. Se escribe igual en BigQuery. No existe <code>IF ... THEN</code> suelto en una consulta." }
+    ],
+    practicar: [
+      { id: "n-b1", titulo: "Los mejores del Oeste", practica: "WHERE y ORDER BY",
+        enunciado: "Muestra los equipos del Oeste que ganaron más partidos de los que perdieron, de más a menos victorias.",
+        columnas: "nombre, victorias, derrotas", orden: true,
+        pistas: ["Son dos condiciones: la conferencia, y comparar dos columnas entre sí.", "WHERE conferencia = 'Oeste' AND victorias > derrotas, y ORDER BY victorias DESC."],
+        sol: `SELECT nombre, victorias, derrotas
+FROM equipos
+WHERE conferencia = 'Oeste'
+  AND victorias > derrotas
+ORDER BY victorias DESC;`,
+        pasos: [
+          { t: "WHERE conferencia = 'Oeste'", d: "Quedan los 11 equipos del Oeste.", q: `SELECT nombre, victorias, derrotas FROM equipos WHERE conferencia = 'Oeste'` },
+          { t: "AND victorias > derrotas", d: "Sale Houston, que terminó 41 y 41, y los de récord negativo.", q: `SELECT nombre, victorias, derrotas, victorias > derrotas AS "victorias > derrotas" FROM equipos WHERE conferencia = 'Oeste'`, hl: ["victorias > derrotas"], bool: ["victorias > derrotas"] },
+          { t: "ORDER BY victorias DESC", d: "De más a menos victorias.", q: `SELECT nombre, victorias, derrotas FROM equipos WHERE conferencia = 'Oeste' AND victorias > derrotas ORDER BY victorias DESC` }
+        ] },
+      { id: "n-b2", titulo: "Los bases y escoltas", practica: "IN y ORDER BY",
+        enunciado: "Muestra los jugadores que son base (PG) o escolta (SG), ordenados por nombre de la A a la Z.",
+        columnas: "nombre, posicion", orden: true,
+        pistas: ["Una columna, dos valores posibles.", "WHERE posicion IN ('PG', 'SG') y ORDER BY nombre."],
+        sol: `SELECT nombre, posicion
+FROM jugadores
+WHERE posicion IN ('PG', 'SG')
+ORDER BY nombre;`,
+        pasos: [
+          { t: "WHERE posicion IN ('PG', 'SG')", d: "IN es lo mismo que <code>posicion = 'PG' OR posicion = 'SG'</code>, más corto.", q: `SELECT nombre, posicion FROM jugadores WHERE posicion IN ('PG', 'SG')`, hl: ["posicion"] },
+          { t: "ORDER BY nombre", d: "Sin DESC, de la A a la Z.", q: `SELECT nombre, posicion FROM jugadores WHERE posicion IN ('PG', 'SG') ORDER BY nombre` }
+        ] },
+      { id: "n-b3", titulo: "Los tres peores", practica: "ORDER BY y LIMIT",
+        enunciado: "Muestra los 3 equipos con menos victorias, del peor al menos malo.",
+        columnas: "nombre, victorias", orden: true,
+        pistas: ["Primero hay que ordenar, y después cortar.", "ORDER BY victorias (sin DESC) y LIMIT 3."],
+        sol: `SELECT nombre, victorias
+FROM equipos
+ORDER BY victorias
+LIMIT 3;`,
+        pasos: [
+          { t: "ORDER BY victorias", d: "De menos a más.", q: `SELECT nombre, victorias FROM equipos ORDER BY victorias` },
+          { t: "LIMIT 3", d: "Se queda con las tres primeras filas del orden.", q: `SELECT nombre, victorias FROM equipos ORDER BY victorias LIMIT 3` }
+        ] },
+      { id: "n-b4", titulo: "Quién ganó cada partido", practica: "CASE",
+        enunciado: "Para cada partido de la final, muestra la fecha y la sigla del equipo que lo ganó.",
+        columnas: "partido, fecha, ganador",
+        pistas: ["Necesitas una columna que diga una cosa u otra según cuál marcador es mayor.", "CASE WHEN puntos_gsw > puntos_cle THEN 'GSW' ELSE 'CLE' END AS ganador."],
+        sol: `SELECT partido, fecha,
+       CASE WHEN puntos_gsw > puntos_cle THEN 'GSW'
+            ELSE 'CLE' END AS ganador
+FROM finales;`,
+        pasos: [
+          { t: "Cada fila, una condición", d: "Para cada partido, el motor revisa si <code>puntos_gsw > puntos_cle</code>.", q: `SELECT partido, puntos_gsw, puntos_cle, puntos_gsw > puntos_cle AS "gsw > cle" FROM finales`, hl: ["gsw > cle"], bool: ["gsw > cle"] },
+          { t: "CASE convierte esa condición en un texto", d: "true se vuelve 'GSW', y si no, 'CLE'.", q: `SELECT partido, fecha, CASE WHEN puntos_gsw > puntos_cle THEN 'GSW' ELSE 'CLE' END AS ganador FROM finales`, hl: ["ganador"] }
+        ],
+        mal: `SELECT partido, fecha, IF(puntos_gsw > puntos_cle) THEN 'GSW' AS ganador
+FROM finales;`,
+        ojo: "En SQL no se escribe <code>IF ... THEN</code> dentro de un SELECT: la forma es <code>CASE WHEN ... THEN ... ELSE ... END</code>." }
+    ]
+  },
+  {
+    id: "m2", titulo: "NULL, AND y OR",
+    intro: "NULL significa «no se sabe». Cualquier comparación con NULL da «no se sabe», y el WHERE solo deja pasar las filas donde la condición es verdadera. Aquí hay NULL de verdad: los jugadores que llegaron a la NBA sin pasar por la universidad.",
+    aprender: [
+      { id: "a2-1", t: "IS NULL e IS NOT NULL", p: "La única forma de preguntar por un vacío.",
+        pregunta: "¿Cuántos jugadores de la tabla no fueron a la universidad?",
+        sql: `SELECT nombre, universidad
+FROM jugadores
+WHERE universidad IS NULL;`, hl: ["universidad"],
+        mal: { sql: `SELECT nombre, universidad
+FROM jugadores
+WHERE universidad = NULL;`, nota: "No da error. Devuelve 0 filas: nada es igual a NULL, ni siquiera otro NULL." } },
+      { id: "a2-2", t: "Cómo evalúa el motor una comparación", p: "Verdadero, falso o «no se sabe».",
+        pregunta: "¿Qué crees que sale para LeBron James en la columna resultado?",
+        sql: `SELECT nombre, universidad,
+       universidad != 'Kentucky' AS resultado
+FROM jugadores;`, hl: ["resultado"], bool: ["resultado"],
+        ojo: "Para LeBron, Kobe, Giannis, Dirk y Porzingis el resultado es NULL, no true. Un WHERE con esa condición los deja fuera." },
+      { id: "a2-3", t: "El != deja fuera a los NULL", p: "Para incluirlos hay que pedirlos aparte, con OR.",
+        pregunta: "Son 24 jugadores y 3 fueron a Kentucky. ¿Cuántas filas devuelve?",
+        sql: `SELECT nombre, universidad
+FROM jugadores
+WHERE universidad != 'Kentucky'
+   OR universidad IS NULL;`, hl: ["universidad"],
+        ojo: "Son 21. Sin el <code>OR universidad IS NULL</code> serían 16: los cinco sin universidad se pierden.",
+        mal: { sql: `SELECT nombre, universidad
+FROM jugadores
+WHERE universidad != 'Kentucky'
+  AND universidad IS NULL;`, nota: "Con AND devuelve 0 filas: una universidad no puede ser distinta de 'Kentucky' y estar vacía al mismo tiempo." } },
+      { id: "a2-4", t: "AND y OR juntos: paréntesis", p: "AND se resuelve antes que OR, como la multiplicación antes que la suma.",
+        pregunta: "¿Cuántos jugadores de Cleveland son bases o no fueron a la universidad?",
+        sql: `SELECT nombre, equipo_id, posicion, universidad
+FROM jugadores
+WHERE equipo_id = 'CLE'
+  AND (posicion = 'PG' OR universidad IS NULL);`,
+        mal: { sql: `SELECT nombre, equipo_id, posicion, universidad
+FROM jugadores
+WHERE equipo_id = 'CLE'
+  AND posicion = 'PG' OR universidad IS NULL;`, nota: "Sin paréntesis se lee (Cleveland y base) o (sin universidad). Se cuelan Kobe, Giannis, Dirk y Porzingis, que no juegan en Cleveland." } },
+      { id: "a2-5", t: "COALESCE", p: "Mostrar otro valor donde hay NULL.",
+        pregunta: "¿Qué dice la fila de Kobe Bryant?",
+        sql: `SELECT nombre,
+       COALESCE(universidad, 'Sin universidad') AS universidad
+FROM jugadores;`, hl: ["universidad"],
+        ojo: "Devuelve el primer valor de la lista que no sea NULL. En BigQuery también existe <code>IFNULL(universidad, 'Sin universidad')</code>." },
+      { id: "a2-6", t: "COUNT(*) y COUNT(columna)", p: "Uno cuenta filas; el otro, valores que no son NULL.",
+        pregunta: "¿Qué tres números salen?",
+        sql: `SELECT COUNT(*)                    AS jugadores,
+       COUNT(universidad)          AS con_universidad,
+       COUNT(DISTINCT universidad) AS universidades
+FROM jugadores;`,
+        ojo: "24 filas, 19 con universidad y 16 universidades distintas: Kentucky aparece tres veces y UCLA dos." }
+    ],
+    practicar: [
+      { id: "n-v1", titulo: "Directo a la NBA", practica: "IS NULL",
+        enunciado: "Muestra los jugadores que no fueron a la universidad.", columnas: "nombre",
+        pistas: ["Un vacío no se compara con =.", "WHERE universidad IS NULL."],
+        sol: `SELECT nombre
+FROM jugadores
+WHERE universidad IS NULL;`,
+        pasos: [
+          { t: "La columna universidad", d: "Cinco filas tienen NULL.", q: `SELECT nombre, universidad FROM jugadores`, hl: ["universidad"] },
+          { t: "WHERE universidad IS NULL", d: "IS NULL es la única forma de preguntar por un vacío.", q: `SELECT nombre FROM jugadores WHERE universidad IS NULL` }
+        ],
+        mal: `SELECT nombre
+FROM jugadores
+WHERE universidad = NULL;`,
+        ojo: "<code>= NULL</code> no da error, pero nunca es verdadero." },
+      { id: "n-v2", titulo: "Todos menos UCLA", practica: "!= con NULL, y OR",
+        enunciado: "Muestra los jugadores cuya universidad no es 'UCLA'. Incluye a los que no fueron a la universidad.", columnas: "nombre",
+        pistas: ["El != deja fuera a los NULL. Hay que sumarlos con otra condición.", "Una fila pasa si cumple una condición o la otra: OR universidad IS NULL."],
+        sol: `SELECT nombre
+FROM jugadores
+WHERE universidad != 'UCLA'
+   OR universidad IS NULL;`,
+        pasos: [
+          { t: "Cómo evalúa cada condición", d: "Para los cinco sin universidad, <code>!= 'UCLA'</code> da NULL.", q: `SELECT nombre, universidad, universidad != 'UCLA' AS "!= 'UCLA'", universidad IS NULL AS "IS NULL" FROM jugadores`, hl: ["!= 'UCLA'", "IS NULL"], bool: ["!= 'UCLA'", "IS NULL"] },
+          { t: "Unidas con OR", d: "Pasa la fila si al menos una es true: 22 jugadores (todos menos Love y Westbrook).", q: `SELECT nombre FROM jugadores WHERE universidad != 'UCLA' OR universidad IS NULL` }
+        ],
+        mal: `SELECT nombre
+FROM jugadores
+WHERE universidad != 'UCLA'
+  AND universidad IS NULL;`,
+        ojo: "Con AND, 0 filas: no se puede ser distinto de 'UCLA' y estar vacío a la vez." },
+      { id: "n-v3", titulo: "Los Angeles, con paréntesis", practica: "Precedencia de AND y OR",
+        enunciado: "Muestra los jugadores de los Lakers o los Clippers (LAL o LAC) que no fueron a la universidad o fueron a 'Michigan'.", columnas: "nombre",
+        pistas: ["Son dos exigencias: el equipo, y además una de dos cosas sobre la universidad.", "equipo_id IN ('LAL', 'LAC') AND (universidad IS NULL OR universidad = 'Michigan')."],
+        sol: `SELECT nombre
+FROM jugadores
+WHERE equipo_id IN ('LAL', 'LAC')
+  AND (universidad IS NULL OR universidad = 'Michigan');`,
+        pasos: [
+          { t: "Sin paréntesis", d: "Se cuelan Giannis, Dirk, LeBron y Porzingis, que no juegan en Los Angeles.", q: `SELECT nombre, equipo_id, universidad FROM jugadores WHERE equipo_id IN ('LAL', 'LAC') AND universidad = 'Michigan' OR universidad IS NULL` },
+          { t: "Con paréntesis", d: "El equipo se exige siempre; los paréntesis agrupan las dos opciones de universidad.", q: `SELECT nombre, equipo_id, universidad FROM jugadores WHERE equipo_id IN ('LAL', 'LAC') AND (universidad IS NULL OR universidad = 'Michigan')` }
+        ],
+        mal: `SELECT nombre
+FROM jugadores
+WHERE equipo_id IN ('LAL', 'LAC')
+  AND universidad = 'Michigan' OR universidad IS NULL;`,
+        ojo: "Cuando mezcles AND y OR, pon paréntesis siempre." }
+    ]
+  },
+  {
+    id: "m3", titulo: "JOIN",
+    intro: "La forma es siempre la misma: FROM tabla alias JOIN otra_tabla alias ON llave = llave. El alias va después del nombre de la tabla. La llave es la columna que las dos tablas comparten: mira «Cómo se conectan» arriba.",
+    aprender: [
+      { id: "a3-1", t: "JOIN (INNER JOIN)", p: "Pegar a cada fila la fila que le corresponde en otra tabla.",
+        pregunta: "¿Cuántas filas salen, y por qué no aparece Boston?",
+        sql: `SELECT j.nombre, e.nombre AS equipo
+FROM jugadores j
+JOIN equipos e ON e.equipo_id = j.equipo_id;`,
+        ojo: "24 filas, una por jugador. Boston y Filadelfia no tienen jugadores en la tabla: con JOIN a secas, lo que no tiene pareja no aparece.",
+        mal: { sql: `SELECT j.nombre, e.nombre AS equipo
+FROM j.jugadores
+JOIN e.equipos ON e.equipo_id = j.equipo_id;`, nota: "Error: el alias va después de la tabla. Escrito así, el motor busca una tabla <code>jugadores</code> dentro de algo llamado <code>j</code>." } },
+      { id: "a3-2", t: "JOIN para traer los números", p: "Nombre y estadísticas viven en tablas distintas.",
+        pregunta: "¿Quiénes son los cinco que más puntos promediaron?",
+        sql: `SELECT j.nombre, s.puntos
+FROM jugadores j
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+ORDER BY s.puntos DESC
+LIMIT 5;` },
+      { id: "a3-3", t: "Tres tablas en cadena", p: "Cuando dos tablas no se tocan, se pasa por la del medio.",
+        pregunta: "Para los Warriors, ¿qué tres jugadores salen y con cuántos puntos?",
+        sql: `SELECT e.nombre AS equipo, j.nombre, s.puntos
+FROM equipos e
+JOIN jugadores j    ON j.equipo_id = e.equipo_id
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+WHERE e.equipo_id = 'GSW';`,
+        ojo: "Cada JOIN lleva su propio ON, con la llave de ese par de tablas." },
+      { id: "a3-4", t: "LEFT JOIN", p: "Todas las filas de la tabla izquierda, tengan pareja o no.",
+        pregunta: "¿Cuántas filas salen ahora?",
+        sql: `SELECT e.nombre AS equipo, j.nombre AS jugador
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id;`, hl: ["jugador"],
+        ojo: "26: los 24 jugadores más Boston y Filadelfia, con NULL en jugador. La izquierda es la tabla que va antes del LEFT JOIN." },
+      { id: "a3-5", t: "Los que no tienen pareja", p: "LEFT JOIN y después quedarse con los NULL.",
+        pregunta: "¿Qué equipos salen?",
+        sql: `SELECT e.nombre
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id
+WHERE j.jugador_id IS NULL;`,
+        ojo: "Se pregunta por una columna de la tabla derecha que nunca es NULL cuando hay pareja, como su identificador." },
+      { id: "a3-6", t: "La condición, en el ON o en el WHERE", p: "ON decide qué se pega; WHERE decide qué se queda.",
+        pregunta: "Cada equipo con su centro (C). ¿Cuántas filas salen?",
+        sql: `SELECT e.nombre AS equipo, j.nombre AS centro
+FROM equipos e
+LEFT JOIN jugadores j
+       ON j.equipo_id = e.equipo_id
+      AND j.posicion = 'C';`, hl: ["centro"],
+        ojo: "18, uno por equipo: Pelicans, Timberwolves y Kings con su centro, y el resto con NULL.",
+        mal: { sql: `SELECT e.nombre AS equipo, j.nombre AS centro
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id
+WHERE j.posicion = 'C';`, nota: "En el WHERE, la condición se aplica después de pegar y borra las filas con NULL: quedan 3 y el LEFT JOIN funciona como un JOIN a secas." } },
+      { id: "a3-7", t: "La llave equivocada", p: "El motor no avisa: une lo que le pidas.",
+        pregunta: "Uniendo por la columna correcta, ¿cuántas filas debería haber?",
+        sql: `SELECT pf.partido, pf.puntos, j.nombre
+FROM puntos_finales pf
+JOIN jugadores j ON j.jugador_id = pf.jugador_id
+WHERE pf.partido = 7;`,
+        mal: { sql: `SELECT pf.partido, pf.puntos, j.nombre
+FROM puntos_finales pf
+JOIN jugadores j ON j.jugador_id = pf.partido
+WHERE pf.partido = 7;`, nota: "Unido por <code>partido</code>, que identifica al partido y no al jugador. No da error: pega a todos con el jugador número 7, Kevin Durant, que ni jugó la final." } }
+    ],
+    practicar: [
+      { id: "n-j1", titulo: "Cada jugador con su equipo", practica: "JOIN ... ON",
+        enunciado: "Muestra cada jugador con el nombre completo de su equipo.", columnas: "jugador, equipo",
+        pistas: ["La forma: FROM jugadores j JOIN equipos e ON …", "La llave que comparten es equipo_id. Las dos columnas se llaman nombre: usa AS."],
+        sol: `SELECT j.nombre AS jugador, e.nombre AS equipo
+FROM jugadores j
+JOIN equipos e ON e.equipo_id = j.equipo_id;`,
+        pasos: [
+          { t: "ON e.equipo_id = j.equipo_id", d: "Cada jugador se pega con el equipo que tiene la misma sigla.", q: `SELECT j.nombre AS "j.nombre", j.equipo_id AS "j.equipo_id", e.equipo_id AS "e.equipo_id", e.nombre AS "e.nombre" FROM jugadores j JOIN equipos e ON e.equipo_id = j.equipo_id`, hl: ["j.equipo_id", "e.equipo_id"] },
+          { t: "SELECT con AS", d: "Las dos columnas se llaman nombre; el alias de tabla dice cuál es cuál y AS les pone nombres claros.", q: `SELECT j.nombre AS jugador, e.nombre AS equipo FROM jugadores j JOIN equipos e ON e.equipo_id = j.equipo_id` }
+        ],
+        mal: `SELECT nombre, nombre
+FROM jugadores j
+JOIN equipos e ON e.equipo_id = j.equipo_id;`,
+        ojo: "Sin el alias de tabla, <code>nombre</code> es ambiguo: existe en las dos tablas." },
+      { id: "n-j2", titulo: "Los premios y sus dueños", practica: "Elegir la llave",
+        enunciado: "Muestra cada premio de la temporada con el nombre del jugador que lo ganó.", columnas: "premio, nombre",
+        pistas: ["¿Qué columna tienen en común premios y jugadores?", "ON j.jugador_id = p.jugador_id."],
+        sol: `SELECT p.premio, j.nombre
+FROM premios p
+JOIN jugadores j ON j.jugador_id = p.jugador_id;`,
+        pasos: [
+          { t: "La tabla premios", d: "Solo trae el número del jugador.", q: `SELECT premio, jugador_id FROM premios`, hl: ["jugador_id"] },
+          { t: "JOIN jugadores por jugador_id", d: "Cada premio encuentra a su ganador.", q: `SELECT p.premio, p.jugador_id AS "p.jugador_id", j.jugador_id AS "j.jugador_id", j.nombre FROM premios p JOIN jugadores j ON j.jugador_id = p.jugador_id`, hl: ["p.jugador_id", "j.jugador_id"] }
+        ] },
+      { id: "n-j3", titulo: "La final, con nombres", practica: "JOIN con la tabla de partidos",
+        enunciado: "Muestra los puntos de cada jugador en cada partido de la final, con su nombre.", columnas: "nombre, partido, puntos",
+        pistas: ["puntos_finales trae el número del jugador, no su nombre.", "JOIN jugadores j ON j.jugador_id = pf.jugador_id."],
+        sol: `SELECT j.nombre, pf.partido, pf.puntos
+FROM puntos_finales pf
+JOIN jugadores j ON j.jugador_id = pf.jugador_id;`,
+        pasos: [
+          { t: "puntos_finales", d: "40 filas: seis jugadores por siete partidos, menos dos que no existen.", q: `SELECT jugador_id, partido, puntos FROM puntos_finales ORDER BY jugador_id, partido`, hl: ["jugador_id"] },
+          { t: "JOIN jugadores", d: "Cada fila recibe el nombre que corresponde a su jugador_id.", q: `SELECT j.nombre, pf.partido, pf.puntos FROM puntos_finales pf JOIN jugadores j ON j.jugador_id = pf.jugador_id ORDER BY j.nombre, pf.partido` }
+        ],
+        mal: `SELECT j.nombre, pf.partido, pf.puntos
+FROM puntos_finales pf
+JOIN jugadores j ON j.jugador_id = pf.partido;`,
+        ojo: "Unir por <code>partido</code> no da error, pero pega jugadores al azar." },
+      { id: "n-j4", titulo: "Todos los equipos, con o sin jugadores", practica: "LEFT JOIN",
+        enunciado: "Muestra todos los equipos y el nombre de sus jugadores. Los equipos sin jugadores en la tabla deben aparecer con el jugador vacío.", columnas: "equipo, jugador",
+        pistas: ["Con JOIN a secas, Boston y Filadelfia desaparecen.", "FROM equipos e LEFT JOIN jugadores j ON …: la tabla que quieres completa va a la izquierda."],
+        sol: `SELECT e.nombre AS equipo, j.nombre AS jugador
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id;`,
+        pasos: [
+          { t: "Con JOIN a secas", d: "24 filas: Boston y Filadelfia no aparecen.", q: `SELECT e.nombre AS equipo, j.nombre AS jugador FROM equipos e JOIN jugadores j ON j.equipo_id = e.equipo_id ORDER BY e.nombre` },
+          { t: "Con LEFT JOIN", d: "26 filas: los dos equipos sin pareja se conservan con NULL.", q: `SELECT e.nombre AS equipo, j.nombre AS jugador FROM equipos e LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id ORDER BY e.nombre`, hl: ["jugador"] }
+        ],
+        mal: `SELECT e.nombre AS equipo, j.nombre AS jugador
+FROM jugadores j
+LEFT JOIN equipos e ON j.equipo_id = e.equipo_id;`,
+        ojo: "Si inviertes el orden, lo que se conserva son los jugadores, y Boston vuelve a desaparecer." },
+      { id: "n-j5", titulo: "Sin premio", practica: "LEFT JOIN + IS NULL",
+        enunciado: "Muestra los jugadores que no ganaron ningún premio.", columnas: "nombre",
+        pistas: ["LEFT JOIN de jugadores con premios, y mira cómo queda la fila de un jugador sin premio.", "WHERE p.premio IS NULL (o p.jugador_id IS NULL)."],
+        sol: `SELECT j.nombre
+FROM jugadores j
+LEFT JOIN premios p ON p.jugador_id = j.jugador_id
+WHERE p.premio IS NULL;`,
+        pasos: [
+          { t: "LEFT JOIN premios", d: "Los que no ganaron nada traen NULL en las columnas de premios.", q: `SELECT j.nombre, p.premio FROM jugadores j LEFT JOIN premios p ON p.jugador_id = j.jugador_id`, hl: ["premio"] },
+          { t: "WHERE p.premio IS NULL", d: "Quedan los 18 sin premio.", q: `SELECT j.nombre FROM jugadores j LEFT JOIN premios p ON p.jugador_id = j.jugador_id WHERE p.premio IS NULL` }
+        ] },
+      { id: "n-j6", titulo: "Cada equipo del Este con su base", practica: "ON contra WHERE",
+        enunciado: "Muestra todos los equipos del Este con el nombre de su base (PG), si lo tienen en la tabla. Los que no tengan uno deben aparecer igual, con el base vacío.", columnas: "equipo, base",
+        pistas: ["La condición sobre la conferencia es de la tabla izquierda; la de la posición, de la derecha.", "La posición va dentro del ON: … ON j.equipo_id = e.equipo_id AND j.posicion = 'PG'. La conferencia, en el WHERE."],
+        sol: `SELECT e.nombre AS equipo, j.nombre AS base
+FROM equipos e
+LEFT JOIN jugadores j
+       ON j.equipo_id = e.equipo_id
+      AND j.posicion = 'PG'
+WHERE e.conferencia = 'Este';`,
+        pasos: [
+          { t: "Posición en el WHERE", d: "Se pierden los equipos sin base: quedan 3.", q: `SELECT e.nombre AS equipo, j.nombre AS base FROM equipos e LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id WHERE e.conferencia = 'Este' AND j.posicion = 'PG'`, hl: ["base"] },
+          { t: "Posición en el ON", d: "Los 7 equipos del Este; Boston, Indiana, Nueva York y Filadelfia con NULL.", q: `SELECT e.nombre AS equipo, j.nombre AS base FROM equipos e LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id AND j.posicion = 'PG' WHERE e.conferencia = 'Este'`, hl: ["base"] }
+        ],
+        mal: `SELECT e.nombre AS equipo, j.nombre AS base
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id
+WHERE e.conferencia = 'Este' AND j.posicion = 'PG';`,
+        ojo: "La condición sobre la tabla izquierda (la conferencia) puede ir en el WHERE sin problema. La de la derecha, en el ON." }
+    ]
+  },
+  {
+    id: "m4", titulo: "Agrupar: GROUP BY, WHERE y HAVING",
+    intro: "Para decidir dónde va una condición, pregúntate: ¿se puede revisar mirando una sola fila? Si sí, va en el WHERE, que filtra filas antes de agrupar. Si necesitas juntar varias filas (un total, un conteo, un promedio), va en el HAVING, que filtra grupos después del GROUP BY.",
+    aprender: [
+      { id: "a4-1", t: "Funciones de agregación", p: "Resumir toda la tabla en una fila.",
+        pregunta: "Entre los seis jugadores, ¿cuántos puntos anotaron en toda la final, y cuál fue el máximo en un partido?",
+        sql: `SELECT COUNT(*)    AS filas,
+       SUM(puntos) AS total,
+       AVG(puntos) AS promedio,
+       MIN(puntos) AS minimo,
+       MAX(puntos) AS maximo
+FROM puntos_finales;`,
+        ojo: "40 filas se convierten en una. El 41 lo anotaron LeBron dos veces y Kyrie una." },
+      { id: "a4-2", t: "GROUP BY: un resumen por grupo", p: "Juntar las filas que comparten un valor y resumir cada grupo.",
+        pregunta: "¿Cuántos puntos sumó LeBron (jugador 4) en la final?",
+        sql: `SELECT jugador_id,
+       COUNT(*)    AS partidos,
+       SUM(puntos) AS total
+FROM puntos_finales
+GROUP BY jugador_id;`, hl: ["jugador_id"],
+        pasos: [
+          { t: "1. Las filas, ordenadas por jugador", d: "Así se ven los grupos que se van a formar.", q: `SELECT jugador_id, partido, puntos FROM puntos_finales ORDER BY jugador_id, partido`, hl: ["jugador_id"] },
+          { t: "2. GROUP BY jugador_id", d: "Cada grupo se aplasta en una fila: COUNT cuenta sus filas y SUM suma sus puntos. Love y Draymond tienen 6 partidos porque les falta una fila.", q: `SELECT jugador_id, COUNT(*) AS partidos, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id`, hl: ["partidos", "total"] }
+        ],
+        ojo: "En BigQuery, toda columna del SELECT que no esté dentro de COUNT, SUM u otra función de agregación tiene que estar en el GROUP BY." },
+      { id: "a4-3", t: "WHERE: filtra filas antes de agrupar", p: "Una condición que se revisa mirando una sola fila.",
+        pregunta: "Contando solo los partidos de 30 puntos o más, ¿cuántos tiene cada uno?",
+        sql: `SELECT jugador_id, COUNT(*) AS partidos_de_30
+FROM puntos_finales
+WHERE puntos >= 30
+GROUP BY jugador_id;`,
+        pasos: [
+          { t: "1. WHERE puntos >= 30", d: "Se revisa cada fila sola. Quedan 10 partidos.", q: `SELECT jugador_id, partido, puntos FROM puntos_finales WHERE puntos >= 30 ORDER BY jugador_id, partido`, hl: ["puntos"] },
+          { t: "2. GROUP BY jugador_id", d: "Ahora se agrupa lo que quedó. Love no aparece: no le quedó ninguna fila.", q: `SELECT jugador_id, COUNT(*) AS partidos_de_30 FROM puntos_finales WHERE puntos >= 30 GROUP BY jugador_id` }
+        ] },
+      { id: "a4-4", t: "HAVING: filtra grupos después de agrupar", p: "Una condición que necesita juntar varias filas.",
+        pregunta: "¿Quiénes sumaron más de 150 puntos en la final?",
+        sql: `SELECT jugador_id, SUM(puntos) AS total
+FROM puntos_finales
+GROUP BY jugador_id
+HAVING SUM(puntos) > 150;`,
+        pasos: [
+          { t: "1. GROUP BY con SUM", d: "Un total por jugador. Ese total no existe en ninguna fila suelta.", q: `SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id`, hl: ["total"] },
+          { t: "2. HAVING SUM(puntos) > 150", d: "HAVING revisa cada grupo ya armado: pasan LeBron (208), Kyrie (190) y Curry (158).", q: `SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id HAVING SUM(puntos) > 150`, hl: ["total"] }
+        ],
+        mal: { sql: `SELECT jugador_id, SUM(puntos) AS total
+FROM puntos_finales
+WHERE SUM(puntos) > 150
+GROUP BY jugador_id;`, nota: "Error: el WHERE trabaja fila por fila, antes de que existan los grupos. Una suma no se puede revisar ahí." } },
+      { id: "a4-5", t: "WHERE y HAVING en la misma consulta", p: "Un filtro sobre filas y otro sobre grupos.",
+        pregunta: "¿Quiénes tuvieron 3 o más partidos de 25 puntos o más?",
+        sql: `SELECT jugador_id, COUNT(*) AS partidos_de_25
+FROM puntos_finales
+WHERE puntos >= 25
+GROUP BY jugador_id
+HAVING COUNT(*) >= 3;`,
+        pasos: [
+          { t: "1. WHERE puntos >= 25", d: "Sobre cada fila: ¿este partido fue de 25 o más?", q: `SELECT jugador_id, partido, puntos FROM puntos_finales WHERE puntos >= 25 ORDER BY jugador_id, partido` },
+          { t: "2. GROUP BY y COUNT", d: "Cuántos partidos así tiene cada uno.", q: `SELECT jugador_id, COUNT(*) AS partidos_de_25 FROM puntos_finales WHERE puntos >= 25 GROUP BY jugador_id`, hl: ["partidos_de_25"] },
+          { t: "3. HAVING COUNT(*) >= 3", d: "Sobre cada grupo: sale Draymond, que tuvo 2.", q: `SELECT jugador_id, COUNT(*) AS partidos_de_25 FROM puntos_finales WHERE puntos >= 25 GROUP BY jugador_id HAVING COUNT(*) >= 3` }
+        ] },
+      { id: "a4-6", t: "Agrupar después de un JOIN", p: "Agrupar por una columna de otra tabla.",
+        pregunta: "¿Qué conferencia tiene más jugadores en la tabla, y cuál promedia más puntos?",
+        sql: `SELECT e.conferencia,
+       COUNT(*)      AS jugadores,
+       AVG(s.puntos) AS promedio_puntos
+FROM equipos e
+JOIN jugadores j    ON j.equipo_id = e.equipo_id
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+GROUP BY e.conferencia;` },
+      { id: "a4-7", t: "Contar sin perder a los que tienen cero", p: "LEFT JOIN y COUNT de una columna de la derecha.",
+        pregunta: "¿Con cuántos jugadores sale Boston?",
+        sql: `SELECT e.nombre, COUNT(j.jugador_id) AS jugadores
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id
+GROUP BY e.equipo_id, e.nombre;`, hl: ["jugadores"],
+        mal: { sql: `SELECT e.nombre, COUNT(*) AS jugadores
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id
+GROUP BY e.equipo_id, e.nombre;`, hl: ["jugadores"], nota: "Con COUNT(*), Boston y Filadelfia salen con 1: se cuenta la fila que el LEFT JOIN rellenó con NULL. COUNT de una columna ignora los NULL." } },
+      { id: "a4-8", t: "Contar con condición", p: "Contar solo las filas que cumplen algo, dentro de cada grupo.",
+        pregunta: "¿Cuántos partidos ganó cada equipo en la final?",
+        sql: `SELECT SUM(CASE WHEN puntos_gsw > puntos_cle THEN 1 ELSE 0 END) AS ganados_gsw,
+       SUM(CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END) AS ganados_cle
+FROM finales;`,
+        ojo: "CASE convierte cada fila en un 1 o un 0, y SUM los suma. En BigQuery también existe <code>COUNTIF(puntos_cle > puntos_gsw)</code>, que hace lo mismo." }
+    ],
+    practicar: [
+      { id: "n-g1", titulo: "Contar por posición", practica: "GROUP BY + COUNT",
+        enunciado: "¿Cuántos jugadores hay de cada posición?", columnas: "posicion, cantidad",
+        pistas: ["Un grupo por cada valor de posicion.", "SELECT posicion, COUNT(*) AS cantidad FROM jugadores GROUP BY posicion."],
+        sol: `SELECT posicion, COUNT(*) AS cantidad
+FROM jugadores
+GROUP BY posicion;`,
+        pasos: [
+          { t: "Las filas ordenadas por posición", d: "Los grupos que se van a formar.", q: `SELECT nombre, posicion FROM jugadores ORDER BY posicion, nombre`, hl: ["posicion"] },
+          { t: "GROUP BY posicion", d: "Cada grupo, una fila con su conteo.", q: `SELECT posicion, COUNT(*) AS cantidad FROM jugadores GROUP BY posicion` }
+        ] },
+      { id: "n-g2", titulo: "Los de más de 20 puntos, por posición", practica: "WHERE antes de agrupar",
+        enunciado: "¿Cuántos jugadores de cada posición promediaron más de 20 puntos?", columnas: "posicion, cantidad",
+        pistas: ["¿«Más de 20 puntos» se revisa mirando una sola fila? Entonces va en el WHERE. Los puntos están en estadisticas.", "JOIN estadisticas, WHERE s.puntos > 20, GROUP BY j.posicion."],
+        sol: `SELECT j.posicion, COUNT(*) AS cantidad
+FROM jugadores j
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+WHERE s.puntos > 20
+GROUP BY j.posicion;`,
+        pasos: [
+          { t: "JOIN y WHERE s.puntos > 20", d: "Se revisa jugador por jugador: quedan 14.", q: `SELECT j.nombre, j.posicion, s.puntos FROM jugadores j JOIN estadisticas s ON s.jugador_id = j.jugador_id WHERE s.puntos > 20 ORDER BY j.posicion`, hl: ["posicion"] },
+          { t: "GROUP BY j.posicion", d: "Ningún ala-pívot (PF) pasó de 20: ese grupo no aparece.", q: `SELECT j.posicion, COUNT(*) AS cantidad FROM jugadores j JOIN estadisticas s ON s.jugador_id = j.jugador_id WHERE s.puntos > 20 GROUP BY j.posicion` }
+        ] },
+      { id: "n-g3", titulo: "Las posiciones más pobladas", practica: "HAVING",
+        enunciado: "Muestra las posiciones que tienen 5 jugadores o más en la tabla.", columnas: "posicion, cantidad",
+        pistas: ["«5 jugadores o más» no se puede saber mirando una sola fila: hay que contar el grupo.", "GROUP BY posicion HAVING COUNT(*) >= 5."],
+        sol: `SELECT posicion, COUNT(*) AS cantidad
+FROM jugadores
+GROUP BY posicion
+HAVING COUNT(*) >= 5;`,
+        pasos: [
+          { t: "GROUP BY posicion", d: "Los cinco grupos con su conteo.", q: `SELECT posicion, COUNT(*) AS cantidad FROM jugadores GROUP BY posicion`, hl: ["cantidad"] },
+          { t: "HAVING COUNT(*) >= 5", d: "Pasan PG (7), SF (5) y SG (5).", q: `SELECT posicion, COUNT(*) AS cantidad FROM jugadores GROUP BY posicion HAVING COUNT(*) >= 5` }
+        ],
+        mal: `SELECT posicion, COUNT(*) AS cantidad
+FROM jugadores
+WHERE COUNT(*) >= 5
+GROUP BY posicion;`,
+        ojo: "Un conteo no se puede usar en el WHERE: en ese momento todavía no hay grupos." },
+      { id: "n-g4", titulo: "Más de 100 en la final", practica: "HAVING con SUM",
+        enunciado: "Muestra el total de puntos de cada jugador en la final, solo de los que sumaron más de 100.", columnas: "jugador_id, total",
+        pistas: ["¿El total se puede ver en una sola fila? No: se arma juntando sus partidos.", "GROUP BY jugador_id HAVING SUM(puntos) > 100."],
+        sol: `SELECT jugador_id, SUM(puntos) AS total
+FROM puntos_finales
+GROUP BY jugador_id
+HAVING SUM(puntos) > 100;`,
+        pasos: [
+          { t: "GROUP BY jugador_id con SUM", d: "Un total por jugador.", q: `SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id`, hl: ["total"] },
+          { t: "HAVING SUM(puntos) > 100", d: "Salen Draymond (99) y Love (51).", q: `SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id HAVING SUM(puntos) > 100` }
+        ],
+        mal: `SELECT jugador_id, SUM(puntos) AS total
+FROM puntos_finales
+WHERE puntos > 100
+GROUP BY jugador_id;`,
+        ojo: "<code>WHERE puntos > 100</code> revisa cada partido por separado, y ninguno pasa de 100: devuelve 0 filas." },
+      { id: "n-g5", titulo: "Jugadores por equipo, con los ceros", practica: "LEFT JOIN + COUNT(columna)",
+        enunciado: "Para cada equipo, cuántos jugadores tiene en la tabla. Los que no tienen ninguno deben aparecer con 0.", columnas: "equipo, jugadores",
+        pistas: ["LEFT JOIN desde equipos, para no perder a Boston ni a Filadelfia.", "COUNT(j.jugador_id), no COUNT(*), y GROUP BY por el equipo."],
+        sol: `SELECT e.nombre AS equipo, COUNT(j.jugador_id) AS jugadores
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id
+GROUP BY e.equipo_id, e.nombre;`,
+        pasos: [
+          { t: "LEFT JOIN", d: "Boston y Filadelfia, con NULL en jugador_id.", q: `SELECT e.nombre, j.jugador_id FROM equipos e LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id ORDER BY e.nombre`, hl: ["jugador_id"] },
+          { t: "COUNT(j.jugador_id)", d: "No cuenta los NULL: esos dos dan 0.", q: `SELECT e.nombre AS equipo, COUNT(j.jugador_id) AS jugadores FROM equipos e LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id GROUP BY e.equipo_id, e.nombre ORDER BY jugadores DESC` }
+        ],
+        mal: `SELECT e.nombre AS equipo, COUNT(*) AS jugadores
+FROM equipos e
+LEFT JOIN jugadores j ON j.equipo_id = e.equipo_id
+GROUP BY e.equipo_id, e.nombre;`,
+        ojo: "Con COUNT(*), los equipos sin jugadores salen con 1." },
+      { id: "n-g6", titulo: "Los de 30 o más", practica: "JOIN + WHERE + GROUP BY + HAVING",
+        enunciado: "Muestra, con su nombre, a los jugadores que tuvieron 2 o más partidos de 30 puntos o más en la final, y cuántos fueron.", columnas: "nombre, partidos_30",
+        pistas: ["Dos filtros: uno sobre cada partido (30 o más) y otro sobre cada jugador (2 o más). ¿Cuál va en el WHERE y cuál en el HAVING?", "JOIN jugadores, WHERE pf.puntos >= 30, GROUP BY j.jugador_id, j.nombre, HAVING COUNT(*) >= 2."],
+        sol: `SELECT j.nombre, COUNT(*) AS partidos_30
+FROM puntos_finales pf
+JOIN jugadores j ON j.jugador_id = pf.jugador_id
+WHERE pf.puntos >= 30
+GROUP BY j.jugador_id, j.nombre
+HAVING COUNT(*) >= 2;`,
+        pasos: [
+          { t: "WHERE pf.puntos >= 30", d: "Sobre cada fila.", q: `SELECT j.nombre, pf.partido, pf.puntos FROM puntos_finales pf JOIN jugadores j ON j.jugador_id = pf.jugador_id WHERE pf.puntos >= 30 ORDER BY j.nombre` },
+          { t: "GROUP BY y COUNT", d: "Cuántos tiene cada uno.", q: `SELECT j.nombre, COUNT(*) AS partidos_30 FROM puntos_finales pf JOIN jugadores j ON j.jugador_id = pf.jugador_id WHERE pf.puntos >= 30 GROUP BY j.jugador_id, j.nombre`, hl: ["partidos_30"] },
+          { t: "HAVING COUNT(*) >= 2", d: "Sobre cada grupo: salen Klay y Draymond, con uno cada uno.", q: `SELECT j.nombre, COUNT(*) AS partidos_30 FROM puntos_finales pf JOIN jugadores j ON j.jugador_id = pf.jugador_id WHERE pf.puntos >= 30 GROUP BY j.jugador_id, j.nombre HAVING COUNT(*) >= 2` }
+        ] },
+      { id: "n-g7", titulo: "El marcador de la serie", practica: "Contar con condición",
+        enunciado: "¿Cuántos partidos ganó cada equipo en la final? Una sola fila con dos columnas.", columnas: "ganados_gsw, ganados_cle",
+        pistas: ["Cada partido tiene que convertirse en un 1 si lo ganó ese equipo y en un 0 si no.", "SUM(CASE WHEN puntos_gsw > puntos_cle THEN 1 ELSE 0 END), y lo mismo al revés."],
+        sol: `SELECT SUM(CASE WHEN puntos_gsw > puntos_cle THEN 1 ELSE 0 END) AS ganados_gsw,
+       SUM(CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END) AS ganados_cle
+FROM finales;`,
+        pasos: [
+          { t: "Un 1 o un 0 por partido", d: "CASE convierte cada partido en un número.", q: `SELECT partido, puntos_gsw, puntos_cle, CASE WHEN puntos_gsw > puntos_cle THEN 1 ELSE 0 END AS gano_gsw, CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END AS gano_cle FROM finales`, hl: ["gano_gsw", "gano_cle"] },
+          { t: "SUM de esos números", d: "3 contra 4: Cleveland remontó un 1-3.", q: `SELECT SUM(CASE WHEN puntos_gsw > puntos_cle THEN 1 ELSE 0 END) AS ganados_gsw, SUM(CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END) AS ganados_cle FROM finales` }
+        ] }
+    ]
+  },
+  {
+    id: "m5", titulo: "Subconsultas y CTE",
+    intro: "Una subconsulta es una consulta entre paréntesis dentro de otra. Un CTE (WITH nombre AS …) es lo mismo, pero con nombre y escrito arriba: arma un resultado intermedio que después se usa como una tabla.",
+    aprender: [
+      { id: "a5-1", t: "Subconsulta que devuelve un número", p: "Comparar cada fila contra un valor calculado aparte.",
+        pregunta: "El promedio de puntos de los 24 jugadores es 21.375. ¿Cuántos lo superan?",
+        sql: `SELECT j.nombre, s.puntos
+FROM jugadores j
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+WHERE s.puntos > (SELECT AVG(puntos) FROM estadisticas);`,
+        pasos: [
+          { t: "1. La consulta de adentro, sola", d: "Devuelve una sola fila con un número.", q: `SELECT AVG(puntos) AS promedio FROM estadisticas`, hl: ["promedio"] },
+          { t: "2. La de afuera la usa como si fuera un número", d: "Cada jugador se compara contra ese valor.", q: `SELECT j.nombre, s.puntos FROM jugadores j JOIN estadisticas s ON s.jugador_id = j.jugador_id WHERE s.puntos > (SELECT AVG(puntos) FROM estadisticas) ORDER BY s.puntos DESC` }
+        ],
+        mal: { sql: `SELECT j.nombre, s.puntos
+FROM jugadores j
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+WHERE s.puntos > AVG(s.puntos);`, nota: "Error: AVG necesita mirar todas las filas, y el WHERE trabaja fila por fila. La subconsulta lo calcula aparte." } },
+      { id: "a5-2", t: "Subconsulta con IN", p: "Filtrar por una lista que sale de otra consulta.",
+        pregunta: "¿Cuántos jugadores ganaron algún premio?",
+        sql: `SELECT nombre
+FROM jugadores
+WHERE jugador_id IN (SELECT jugador_id FROM premios);` },
+      { id: "a5-3", t: "Subconsulta en el FROM", p: "Usar el resultado de una consulta como si fuera una tabla.",
+        pregunta: "¿Cuál es el promedio de los totales de los seis jugadores en la final?",
+        sql: `SELECT AVG(total) AS promedio_de_los_totales
+FROM (SELECT jugador_id, SUM(puntos) AS total
+      FROM puntos_finales
+      GROUP BY jugador_id) t;`,
+        ojo: "Primero se arma la tabla de totales (6 filas) y después se promedia esa tabla: 140.5. Es distinto del promedio de los 40 partidos (21.075)." },
+      { id: "a5-4", t: "CTE con WITH", p: "Lo mismo, con nombre y leyéndose de arriba hacia abajo.",
+        pregunta: "¿Quiénes sumaron más de 150 en la final?",
+        sql: `WITH totales AS (
+  SELECT jugador_id, SUM(puntos) AS total
+  FROM puntos_finales
+  GROUP BY jugador_id
+)
+SELECT j.nombre, t.total
+FROM totales t
+JOIN jugadores j ON j.jugador_id = t.jugador_id
+WHERE t.total > 150;`,
+        pasos: [
+          { t: "1. El cuerpo del CTE, solo", d: "Una consulta normal: un total por jugador.", q: `SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id`, hl: ["total"] },
+          { t: "2. Usarlo como tabla", d: "En la tabla del CTE, total ya es una columna cualquiera. Por eso se filtra con WHERE.", q: `WITH totales AS (SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id) SELECT j.nombre, t.total FROM totales t JOIN jugadores j ON j.jugador_id = t.jugador_id WHERE t.total > 150` }
+        ] },
+      { id: "a5-5", t: "Usar el mismo CTE dos veces", p: "Comparar cada total con el promedio de los totales.",
+        pregunta: "El promedio de los totales es 140.5. ¿Quiénes lo superan?",
+        sql: `WITH totales AS (
+  SELECT jugador_id, SUM(puntos) AS total
+  FROM puntos_finales
+  GROUP BY jugador_id
+)
+SELECT j.nombre, t.total
+FROM totales t
+JOIN jugadores j ON j.jugador_id = t.jugador_id
+WHERE t.total > (SELECT AVG(total) FROM totales);`,
+        ojo: "El CTE se usa una vez como tabla y otra dentro de la subconsulta. Klay, con 137, queda justo por debajo." },
+      { id: "a5-6", t: "Dos CTE encadenados", p: "El segundo puede usar al primero.",
+        pregunta: "¿Cuántos jugadores sumaron más de 150?",
+        sql: `WITH totales AS (
+  SELECT jugador_id, SUM(puntos) AS total
+  FROM puntos_finales
+  GROUP BY jugador_id
+),
+sobre_150 AS (
+  SELECT * FROM totales WHERE total > 150
+)
+SELECT COUNT(*) AS jugadores
+FROM sobre_150;`,
+        ojo: "Se separan con una coma y el WITH se escribe una sola vez." }
+    ],
+    practicar: [
+      { id: "n-s1", titulo: "Más rebotes que el promedio", practica: "Subconsulta en el WHERE",
+        enunciado: "Muestra los jugadores que promediaron más rebotes que el promedio de rebotes de todos los jugadores de la tabla.", columnas: "nombre, rebotes",
+        pistas: ["Primero escribe sola la consulta que da el promedio de rebotes.", "WHERE s.rebotes > (SELECT AVG(rebotes) FROM estadisticas)."],
+        sol: `SELECT j.nombre, s.rebotes
+FROM jugadores j
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+WHERE s.rebotes > (SELECT AVG(rebotes) FROM estadisticas);`,
+        pasos: [
+          { t: "El promedio, solo", d: "6.45 rebotes.", q: `SELECT AVG(rebotes) AS promedio FROM estadisticas`, hl: ["promedio"] },
+          { t: "La comparación", d: "Trece jugadores lo superan.", q: `SELECT j.nombre, s.rebotes FROM jugadores j JOIN estadisticas s ON s.jugador_id = j.jugador_id WHERE s.rebotes > (SELECT AVG(rebotes) FROM estadisticas) ORDER BY s.rebotes DESC` }
+        ] },
+      { id: "n-s2", titulo: "Más de 150, con CTE", practica: "CTE (WITH)",
+        enunciado: "Usando un CTE, calcula el total de puntos de cada jugador en la final y muestra, con su nombre, a los que superaron 150.", columnas: "nombre, total",
+        pistas: ["Arma primero la consulta que da jugador_id y total. Pruébala sola.", "WITH totales AS ( … ), y después únela con jugadores y filtra con WHERE t.total > 150."],
+        sol: `WITH totales AS (
+  SELECT jugador_id, SUM(puntos) AS total
+  FROM puntos_finales
+  GROUP BY jugador_id
+)
+SELECT j.nombre, t.total
+FROM totales t
+JOIN jugadores j ON j.jugador_id = t.jugador_id
+WHERE t.total > 150;`,
+        pasos: [
+          { t: "El CTE solo", d: "Seis totales.", q: `SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id`, hl: ["total"] },
+          { t: "JOIN y WHERE", d: "LeBron, Kyrie y Curry.", q: `WITH totales AS (SELECT jugador_id, SUM(puntos) AS total FROM puntos_finales GROUP BY jugador_id) SELECT j.nombre, t.total FROM totales t JOIN jugadores j ON j.jugador_id = t.jugador_id WHERE t.total > 150` }
+        ] },
+      { id: "n-s3", titulo: "Los mejores partidos de LeBron", practica: "Subconsulta con filtro",
+        enunciado: "Muestra los partidos de la final en que LeBron James (jugador 4) anotó más que su propio promedio en la serie.", columnas: "partido, puntos",
+        pistas: ["El promedio de LeBron es una consulta aparte, filtrada por su jugador_id.", "WHERE jugador_id = 4 AND puntos > (SELECT AVG(puntos) FROM puntos_finales WHERE jugador_id = 4)."],
+        sol: `SELECT partido, puntos
+FROM puntos_finales
+WHERE jugador_id = 4
+  AND puntos > (SELECT AVG(puntos)
+                FROM puntos_finales
+                WHERE jugador_id = 4);`,
+        pasos: [
+          { t: "Su promedio", d: "208 puntos en 7 partidos: 29.71.", q: `SELECT AVG(puntos) AS promedio_lebron FROM puntos_finales WHERE jugador_id = 4`, hl: ["promedio_lebron"] },
+          { t: "Sus partidos sobre ese número", d: "El 3, el 5 y el 6.", q: `SELECT partido, puntos FROM puntos_finales WHERE jugador_id = 4 AND puntos > (SELECT AVG(puntos) FROM puntos_finales WHERE jugador_id = 4)` }
+        ],
+        mal: `SELECT partido, puntos
+FROM puntos_finales
+WHERE jugador_id = 4
+  AND puntos > (SELECT AVG(puntos) FROM puntos_finales);`,
+        ojo: "Si a la subconsulta le falta su propio WHERE, compara contra el promedio de los seis jugadores (21.075) y se cuelan casi todos sus partidos." },
+      { id: "n-s4", titulo: "Equipos sobre el promedio", practica: "HAVING con subconsulta",
+        enunciado: "Muestra los equipos cuyo promedio de puntos (de sus jugadores en la tabla) supera el promedio de puntos de todos los jugadores.", columnas: "equipo, promedio",
+        pistas: ["Es un promedio por grupo comparado contra un número calculado aparte. ¿WHERE o HAVING?", "GROUP BY el equipo, HAVING AVG(s.puntos) > (SELECT AVG(puntos) FROM estadisticas)."],
+        sol: `SELECT e.nombre AS equipo, AVG(s.puntos) AS promedio
+FROM equipos e
+JOIN jugadores j    ON j.equipo_id = e.equipo_id
+JOIN estadisticas s ON s.jugador_id = j.jugador_id
+GROUP BY e.equipo_id, e.nombre
+HAVING AVG(s.puntos) > (SELECT AVG(puntos) FROM estadisticas);`,
+        pasos: [
+          { t: "Promedio por equipo", d: "Un número por equipo, armado con sus jugadores.", q: `SELECT e.nombre AS equipo, AVG(s.puntos) AS promedio FROM equipos e JOIN jugadores j ON j.equipo_id = e.equipo_id JOIN estadisticas s ON s.jugador_id = j.jugador_id GROUP BY e.equipo_id, e.nombre ORDER BY promedio DESC`, hl: ["promedio"] },
+          { t: "HAVING contra el promedio general (21.375)", d: "Ocho equipos lo superan.", q: `SELECT e.nombre AS equipo, AVG(s.puntos) AS promedio FROM equipos e JOIN jugadores j ON j.equipo_id = e.equipo_id JOIN estadisticas s ON s.jugador_id = j.jugador_id GROUP BY e.equipo_id, e.nombre HAVING AVG(s.puntos) > (SELECT AVG(puntos) FROM estadisticas) ORDER BY promedio DESC` }
+        ] }
+    ]
+  },
+  {
+    id: "m6", titulo: "Funciones de ventana",
+    intro: "GROUP BY aplasta cada grupo en una fila. Una función de ventana calcula sobre el grupo y conserva todas las filas. PARTITION BY define el grupo y ORDER BY el orden dentro de él.",
+    aprender: [
+      { id: "a6-1", t: "Un total por grupo, sin perder las filas", p: "SUM(...) OVER (PARTITION BY ...).",
+        pregunta: "¿Qué número aparece en total_serie en todas las filas de LeBron?",
+        sql: `SELECT jugador_id, partido, puntos,
+       SUM(puntos) OVER (PARTITION BY jugador_id) AS total_serie
+FROM puntos_finales
+ORDER BY jugador_id, partido;`, hl: ["total_serie"] },
+      { id: "a6-2", t: "Acumulado", p: "Con ORDER BY dentro del OVER, la suma va avanzando.",
+        pregunta: "¿Con cuántos puntos acumulados llegó LeBron al partido 7?",
+        sql: `SELECT partido, puntos,
+       SUM(puntos) OVER (ORDER BY partido) AS acumulado
+FROM puntos_finales
+WHERE jugador_id = 4;`, hl: ["acumulado"] },
+      { id: "a6-3", t: "La serie, partido a partido", p: "Un acumulado de victorias: el 3-1 que se dio vuelta.",
+        pregunta: "¿Cómo iba la serie después del partido 4?",
+        sql: `SELECT partido,
+       SUM(CASE WHEN puntos_gsw > puntos_cle THEN 1 ELSE 0 END)
+         OVER (ORDER BY partido) AS gsw,
+       SUM(CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END)
+         OVER (ORDER BY partido) AS cle
+FROM finales;`, hl: ["gsw", "cle"],
+        ojo: "Después del 4, los Warriors ganaban 3-1. Ningún equipo había remontado un 1-3 en una final." },
+      { id: "a6-4", t: "ROW_NUMBER y RANK", p: "Numerar dentro de cada grupo; RANK repite el número en los empates.",
+        pregunta: "LeBron anotó 41 en el 5 y en el 6. ¿Qué número le da cada función a esos dos partidos?",
+        sql: `SELECT partido, puntos,
+       ROW_NUMBER() OVER (ORDER BY puntos DESC) AS fila,
+       RANK()       OVER (ORDER BY puntos DESC) AS puesto
+FROM puntos_finales
+WHERE jugador_id = 4;`, hl: ["fila", "puesto"],
+        ojo: "ROW_NUMBER nunca repite: a uno de los empatados le toca el 2, y cuál depende del motor si no desempatas tú. RANK les da 1 a los dos y salta al 3." },
+      { id: "a6-5", t: "El mejor partido de cada jugador", p: "Numerar en un CTE y quedarse con el 1.",
+        pregunta: "¿Cuál fue el mejor partido de Curry?",
+        sql: `WITH numerados AS (
+  SELECT jugador_id, partido, puntos,
+         ROW_NUMBER() OVER (PARTITION BY jugador_id
+                            ORDER BY puntos DESC, partido) AS n
+  FROM puntos_finales
+)
+SELECT jugador_id, partido, puntos
+FROM numerados
+WHERE n = 1;`,
+        ojo: "El <code>partido</code> después de <code>puntos DESC</code> desempata: entre los dos 41 de LeBron, gana el primero." },
+      { id: "a6-6", t: "QUALIFY", bq: true, p: "El mismo resultado, sin CTE.",
+        pregunta: "¿Da lo mismo que el ejemplo anterior?",
+        sql: `SELECT jugador_id, partido, puntos
+FROM puntos_finales
+QUALIFY ROW_NUMBER() OVER (PARTITION BY jugador_id
+                           ORDER BY puntos DESC, partido) = 1;`,
+        run: `SELECT jugador_id, partido, puntos FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY jugador_id ORDER BY puntos DESC, partido) AS n FROM puntos_finales) WHERE n = 1`,
+        ojo: "QUALIFY filtra por una función de ventana, igual que HAVING filtra por un agregado. Si BigQuery reclama que falta un WHERE, agrega <code>WHERE TRUE</code> antes del QUALIFY." }
+    ],
+    practicar: [
+      { id: "n-w1", titulo: "El acumulado de Curry", practica: "SUM OVER (ORDER BY)",
+        enunciado: "Para cada partido de la final, muestra los puntos de Stephen Curry (jugador 1) y su acumulado en la serie.", columnas: "partido, puntos, acumulado",
+        pistas: ["Filtra a Curry con WHERE y suma con una ventana ordenada.", "SUM(puntos) OVER (ORDER BY partido) AS acumulado."],
+        sol: `SELECT partido, puntos,
+       SUM(puntos) OVER (ORDER BY partido) AS acumulado
+FROM puntos_finales
+WHERE jugador_id = 1;`,
+        pasos: [
+          { t: "Sus partidos", d: "Siete filas.", q: `SELECT partido, puntos FROM puntos_finales WHERE jugador_id = 1 ORDER BY partido` },
+          { t: "La ventana ordenada", d: "Cada fila suma todo lo anterior más ella misma.", q: `SELECT partido, puntos, SUM(puntos) OVER (ORDER BY partido) AS acumulado FROM puntos_finales WHERE jugador_id = 1`, hl: ["acumulado"] }
+        ] },
+      { id: "n-w2", titulo: "El mejor partido de cada uno", practica: "ROW_NUMBER con PARTITION BY",
+        enunciado: "Muestra el mejor partido de cada jugador en la final. Si hay empate, el primero.", columnas: "jugador_id, partido, puntos",
+        pistas: ["Numera los partidos de cada jugador de más a menos puntos, en un CTE.", "ROW_NUMBER() OVER (PARTITION BY jugador_id ORDER BY puntos DESC, partido) AS n, y después WHERE n = 1."],
+        sol: `WITH numerados AS (
+  SELECT jugador_id, partido, puntos,
+         ROW_NUMBER() OVER (PARTITION BY jugador_id
+                            ORDER BY puntos DESC, partido) AS n
+  FROM puntos_finales
+)
+SELECT jugador_id, partido, puntos
+FROM numerados
+WHERE n = 1;`,
+        pasos: [
+          { t: "Numerar dentro de cada jugador", d: "El 1 es su mejor partido.", q: `SELECT jugador_id, partido, puntos, ROW_NUMBER() OVER (PARTITION BY jugador_id ORDER BY puntos DESC, partido) AS n FROM puntos_finales ORDER BY jugador_id, n`, hl: ["n"] },
+          { t: "Quedarse con el 1", d: "Una fila por jugador.", q: `WITH numerados AS (SELECT jugador_id, partido, puntos, ROW_NUMBER() OVER (PARTITION BY jugador_id ORDER BY puntos DESC, partido) AS n FROM puntos_finales) SELECT jugador_id, partido, puntos FROM numerados WHERE n = 1` }
+        ],
+        ojo: "Con GROUP BY y MAX(puntos) tienes el máximo, pero no de qué partido es. Si agregas <code>partido</code> al SELECT sin agruparlo, BigQuery da error; este motor lo deja pasar y elige un partido cualquiera." },
+      { id: "n-w3", titulo: "La remontada", practica: "Acumulado con CASE",
+        enunciado: "Para cada partido, cuántos partidos llevaba ganados Cleveland hasta ese momento, incluido ese.", columnas: "partido, victorias_cle",
+        pistas: ["Cada partido vale 1 si lo ganó Cleveland y 0 si no. Después, acumulado.", "SUM(CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END) OVER (ORDER BY partido)."],
+        sol: `SELECT partido,
+       SUM(CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END)
+         OVER (ORDER BY partido) AS victorias_cle
+FROM finales;`,
+        pasos: [
+          { t: "1 o 0 por partido", d: "CASE dice si ese partido lo ganó Cleveland.", q: `SELECT partido, puntos_gsw, puntos_cle, CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END AS gano_cle FROM finales`, hl: ["gano_cle"] },
+          { t: "El acumulado", d: "0, 0, 1, 1, 2, 3, 4.", q: `SELECT partido, SUM(CASE WHEN puntos_cle > puntos_gsw THEN 1 ELSE 0 END) OVER (ORDER BY partido) AS victorias_cle FROM finales`, hl: ["victorias_cle"] }
+        ] }
+    ]
+  },
+  {
+    id: "m7", titulo: "Duplicados y filas que se multiplican",
+    intro: "Dos problemas de todos los días en ingeniería de datos: una carga que trae filas repetidas, y un JOIN que repite filas sin que te des cuenta. La tabla carga_puntos es inventada para mostrar el primero.",
+    aprender: [
+      { id: "a7-1", t: "Encontrar los repetidos", p: "Agrupar por lo que debería ser único y dejar lo que aparece más de una vez.",
+        pregunta: "¿Qué combinaciones de jugador y partido vienen repetidas?",
+        sql: `SELECT jugador_id, partido, COUNT(*) AS veces
+FROM carga_puntos
+GROUP BY jugador_id, partido
+HAVING COUNT(*) > 1;` },
+      { id: "a7-2", t: "Quedarse con una fila por llave", p: "Numerar dentro de cada llave y quedarse con la 1.",
+        pregunta: "Para Curry en el partido 7, ¿qué carga sobrevive?",
+        sql: `WITH numeradas AS (
+  SELECT jugador_id, partido, puntos, cargado_el,
+         ROW_NUMBER() OVER (PARTITION BY jugador_id, partido
+                            ORDER BY cargado_el DESC) AS n
+  FROM carga_puntos
+)
+SELECT jugador_id, partido, puntos, cargado_el
+FROM numeradas
+WHERE n = 1;`,
+        ojo: "El ORDER BY decide cuál sobrevive: aquí, la carga más reciente.",
+        mal: { sql: `SELECT DISTINCT jugador_id, partido, puntos, cargado_el
+FROM carga_puntos;`, nota: "DISTINCT solo quita copias exactas. Curry en el 7 sigue dos veces, porque sus dos filas tienen distinta hora de carga." } },
+      { id: "a7-3", t: "Un JOIN que multiplica filas", p: "Contar desde la tabla repetida infla el número.",
+        pregunta: "¿Cuántos jugadores tienen los Warriors en puntos_finales: 3 o 20?",
+        sql: `SELECT j.equipo_id,
+       COUNT(j.jugador_id)          AS conteo_inflado,
+       COUNT(DISTINCT j.jugador_id) AS jugadores,
+       SUM(pf.puntos)               AS puntos
+FROM jugadores j
+JOIN puntos_finales pf ON pf.jugador_id = j.jugador_id
+GROUP BY j.equipo_id;`, hl: ["conteo_inflado", "jugadores"],
+        ojo: "Cada jugador aparece una vez por partido, así que COUNT cuenta partidos, no jugadores. COUNT(DISTINCT …) cuenta cada uno una sola vez." },
+      { id: "a7-4", t: "Agregar antes de unir", p: "Cada resumen en su CTE, y recién después el JOIN.",
+        pregunta: "¿Cuántos puntos sumó cada equipo con estos tres jugadores?",
+        sql: `WITH por_jugador AS (
+  SELECT jugador_id, SUM(puntos) AS puntos
+  FROM puntos_finales
+  GROUP BY jugador_id
+)
+SELECT j.equipo_id,
+       COUNT(*)      AS jugadores,
+       SUM(t.puntos) AS puntos
+FROM por_jugador t
+JOIN jugadores j ON j.jugador_id = t.jugador_id
+GROUP BY j.equipo_id;`,
+        ojo: "Primero una fila por jugador; ahí el JOIN ya no repite nada, y COUNT(*) cuenta jugadores de verdad." }
+    ],
+    practicar: [
+      { id: "n-d1", titulo: "La carga repetida", practica: "GROUP BY + HAVING para duplicados",
+        enunciado: "En carga_puntos, muestra las combinaciones de jugador y partido que aparecen más de una vez, y cuántas veces.", columnas: "jugador_id, partido, veces",
+        pistas: ["Agrupa por las dos columnas que deberían ser únicas juntas.", "GROUP BY jugador_id, partido HAVING COUNT(*) > 1."],
+        sol: `SELECT jugador_id, partido, COUNT(*) AS veces
+FROM carga_puntos
+GROUP BY jugador_id, partido
+HAVING COUNT(*) > 1;`,
+        pasos: [
+          { t: "La carga completa", d: "Siete filas, ordenadas por jugador y partido.", q: `SELECT * FROM carga_puntos ORDER BY jugador_id, partido`, hl: ["jugador_id", "partido"] },
+          { t: "GROUP BY y HAVING", d: "LeBron en el 7 y Curry en el 7 vienen dos veces.", q: `SELECT jugador_id, partido, COUNT(*) AS veces FROM carga_puntos GROUP BY jugador_id, partido HAVING COUNT(*) > 1` }
+        ] },
+      { id: "n-d2", titulo: "Jugadores y puntos por equipo, sin inflar", practica: "COUNT(DISTINCT) o agregar antes",
+        enunciado: "Por equipo, cuántos jugadores distintos aparecen en puntos_finales y cuántos puntos sumaron entre todos.", columnas: "equipo_id, jugadores, puntos",
+        pistas: ["Si unes jugadores con puntos_finales y cuentas, cada jugador aparece una vez por partido.", "COUNT(DISTINCT j.jugador_id), o primero un CTE con un total por jugador."],
+        sol: `SELECT j.equipo_id,
+       COUNT(DISTINCT j.jugador_id) AS jugadores,
+       SUM(pf.puntos)               AS puntos
+FROM jugadores j
+JOIN puntos_finales pf ON pf.jugador_id = j.jugador_id
+GROUP BY j.equipo_id;`,
+        pasos: [
+          { t: "El JOIN repite jugadores", d: "Una fila por jugador y partido.", q: `SELECT j.equipo_id, j.nombre, pf.partido FROM jugadores j JOIN puntos_finales pf ON pf.jugador_id = j.jugador_id ORDER BY j.equipo_id, j.nombre`, hl: ["nombre"] },
+          { t: "COUNT(DISTINCT)", d: "Tres jugadores por equipo.", q: `SELECT j.equipo_id, COUNT(DISTINCT j.jugador_id) AS jugadores, SUM(pf.puntos) AS puntos FROM jugadores j JOIN puntos_finales pf ON pf.jugador_id = j.jugador_id GROUP BY j.equipo_id` }
+        ],
+        mal: `SELECT j.equipo_id, COUNT(j.jugador_id) AS jugadores, SUM(pf.puntos) AS puntos
+FROM jugadores j
+JOIN puntos_finales pf ON pf.jugador_id = j.jugador_id
+GROUP BY j.equipo_id;`,
+        ojo: "Con COUNT a secas te da 20 jugadores por equipo: en realidad está contando partidos." }
+    ]
+  },
+  {
+    id: "m8", titulo: "Fechas en BigQuery",
+    intro: "Las funciones de fecha cambian de un motor a otro. Aquí van las de BigQuery, con la columna fecha como tipo DATE. Su resultado se calculó con la consulta equivalente de este motor; se practican directo en BigQuery.",
+    aprender: [
+      { id: "a8-1", t: "Filtrar un rango de fechas", p: "Un rango con >= y <. Funciona igual en cualquier motor.",
+        pregunta: "¿Qué partidos se jugaron entre el 10 y el 16 de junio, incluido el 16?",
+        sql: `SELECT partido, fecha
+FROM finales
+WHERE fecha >= '2016-06-10'
+  AND fecha <  '2016-06-17';`,
+        ojo: "Desde el primer día hasta antes del día siguiente al último. Así no se pierde nada si la columna trae hora." },
+      { id: "a8-2", t: "EXTRACT", bq: true, p: "Sacar el día, el mes o el año de una fecha.",
+        pregunta: "¿En qué día del mes se jugó el partido 7?",
+        sql: `SELECT partido, fecha,
+       EXTRACT(DAY FROM fecha)   AS dia,
+       EXTRACT(MONTH FROM fecha) AS mes
+FROM finales;`,
+        run: `SELECT partido, fecha, CAST(strftime('%d', fecha) AS INTEGER) AS dia, CAST(strftime('%m', fecha) AS INTEGER) AS mes FROM finales` },
+      { id: "a8-3", t: "DATE_DIFF: días entre dos fechas", bq: true, p: "Cuántos días hay de una fecha a otra.",
+        pregunta: "¿Cuántos días duró la final, del partido 1 al 7?",
+        sql: `SELECT partido, fecha,
+       DATE_DIFF(fecha, DATE '2016-06-02', DAY) AS dias_desde_el_1
+FROM finales;`,
+        run: `SELECT partido, fecha, CAST(julianday(fecha) - julianday('2016-06-02') AS INTEGER) AS dias_desde_el_1 FROM finales`, hl: ["dias_desde_el_1"] },
+      { id: "a8-4", t: "DATE_TRUNC para agrupar por semana", bq: true, p: "Lleva cada fecha al inicio de su semana (domingo, en BigQuery).",
+        pregunta: "¿Cuántos partidos se jugaron cada semana?",
+        sql: `SELECT DATE_TRUNC(fecha, WEEK) AS semana,
+       COUNT(*)                 AS partidos
+FROM finales
+GROUP BY semana
+ORDER BY semana;`,
+        run: `SELECT date(fecha, '-' || strftime('%w', fecha) || ' days') AS semana, COUNT(*) AS partidos FROM finales GROUP BY semana ORDER BY semana`,
+        ojo: "Con <code>MONTH</code> en vez de <code>WEEK</code> agrupa por mes. Agrupar por DATE_TRUNC conserva el año; agrupar solo por EXTRACT(MONTH …) mezclaría junio de dos años distintos." },
+      { id: "a8-5", t: "FORMAT_DATE", bq: true, p: "Mostrar una fecha como texto, con el formato que quieras.",
+        pregunta: "¿Cómo se ve la fecha del partido 1?",
+        sql: `SELECT partido,
+       FORMAT_DATE('%d-%m-%Y', fecha) AS fecha_chilena
+FROM finales;`,
+        run: `SELECT partido, strftime('%d-%m-%Y', fecha) AS fecha_chilena FROM finales`, hl: ["fecha_chilena"] }
+    ],
+    practicar: []
+  }
+];
+const SOLO_BIGQUERY = [
+  ["Nombre completo de una tabla", "`proyecto.dataset.tabla`", "Va entre acentos graves (backticks). Los textos van entre comillas simples."],
+  ["GROUP BY estricto", "SELECT a, SUM(b) … GROUP BY a", "Toda columna sin agregar del SELECT tiene que estar en el GROUP BY."],
+  ["Contar con condición", "COUNTIF(puntos >= 30)", "Cuenta las filas donde la condición es verdadera."],
+  ["Filtrar por una ventana", "QUALIFY ROW_NUMBER() OVER (…) = 1", "Evita el CTE cuando solo quieres una fila por grupo."],
+  ["Todas las columnas menos una", "SELECT * EXCEPT(n)", "Útil para sacar la columna auxiliar después de numerar."],
+  ["División segura", "SAFE_DIVIDE(a, b)", "Devuelve NULL en vez de fallar cuando b es 0."],
+  ["Comentarios", "-- una línea    /* varias */", "Para dejar anotado por qué un campo se calcula así."]
+];
+const ERRORES_FRECUENTES = [
+  ["FROM j.jugadores", "Error: no existe la tabla", "FROM jugadores j", "El alias va después del nombre de la tabla."],
+  ["JOIN equipos e  (sin ON)", "Error, o todas las combinaciones posibles", "JOIN equipos e ON e.equipo_id = j.equipo_id", "Cada JOIN lleva su ON."],
+  ["ON con la columna equivocada", "0 filas, o parejas sin sentido. Sin error", "ON con la columna que las dos tablas comparten", "Mira «Cómo se conectan» antes de unir."],
+  ["WHERE SUM(puntos) > 150", "Error: agregado en el WHERE", "GROUP BY … HAVING SUM(puntos) > 150", "¿Se revisa mirando una sola fila? WHERE. ¿Necesita juntar varias? HAVING."],
+  ["AS total de puntos", "Error de sintaxis", "AS total_de_puntos", "Los nombres no llevan espacios."],
+  ["universidad = NULL", "0 filas. Sin error", "universidad IS NULL", "Nada es igual a NULL."],
+  ["a != 'x' AND a IS NULL", "0 filas. Sin error", "a != 'x' OR a IS NULL", "Dos condiciones que no se pueden cumplir juntas van con OR."],
+  ["x AND y OR z", "Filas de más. Sin error", "x AND (y OR z)", "AND se resuelve antes que OR."],
+  ["posicion = 'c'", "0 filas. Sin error", "posicion = 'C'", "Los textos distinguen mayúsculas."],
+  ["ORDER BY victorias", "De menos a más. Sin error", "ORDER BY victorias DESC", "Sin DESC el orden es ascendente."],
+  ["LEFT JOIN … WHERE derecha.col = 'x'", "Desaparecen los que no tienen pareja. Sin error", "LEFT JOIN … ON … AND derecha.col = 'x'", "ON decide qué se pega; WHERE decide qué se queda."],
+  ["COUNT(*) con LEFT JOIN", "Los que no tienen nada salen con 1. Sin error", "COUNT(derecha.id)", "COUNT de una columna ignora los NULL."],
+  ["nombre  (existe en dos tablas)", "Error: columna ambigua", "j.nombre", "Pon el alias de la tabla."],
+  ["IF(cond) THEN … dentro del SELECT", "Error de sintaxis", "CASE WHEN cond THEN … ELSE … END", "En SQL la condición dentro de una columna se escribe con CASE."]
+];
+
+/* Datos inventados y ejercicios del taller. Se usa igual en la página y en la verificación con node. */
+const PRACTICA = {
+  esquema: `
+CREATE TABLE clientes (cliente_id INTEGER, nombre TEXT, segmento TEXT, region TEXT, fecha_alta TEXT);
+CREATE TABLE cuentas (cuenta_id INTEGER, cliente_id INTEGER, tipo TEXT, fecha_apertura TEXT, estado TEXT);
+CREATE TABLE movimientos (mov_id INTEGER, cuenta_id INTEGER, fecha TEXT, monto INTEGER, tipo TEXT, canal TEXT);
+INSERT INTO clientes VALUES
+ (1,'Ana Rojas','Premium','Sur','2026-03-14'),
+ (2,'Bruno Díaz',NULL,'Sur','2026-01-10'),
+ (3,'Carla Muñoz','Masivo','Norte','2025-11-02'),
+ (4,'Diego Soto','Pyme','Centro','2025-06-20'),
+ (5,'Elena Vidal',NULL,'Norte','2026-05-20'),
+ (6,'Felipe Araya','Masivo','Sur','2024-07-02'),
+ (7,'Gabriela Pinto','Premium','Centro','2026-08-09');
+INSERT INTO cuentas VALUES
+ (101,1,'corriente','2026-03-15','activa'),
+ (102,1,'ahorro','2026-04-01','activa'),
+ (103,2,'vista','2026-01-11','activa'),
+ (104,3,'corriente','2025-11-03','activa'),
+ (105,3,'vista','2025-12-01','cerrada'),
+ (106,4,'corriente','2025-06-21','activa'),
+ (107,5,'ahorro','2026-05-21','activa'),
+ (108,7,'vista','2026-08-10','cerrada'),
+ (109,4,'corriente','2025-07-01','activa');
+INSERT INTO movimientos VALUES
+ (1001,101,'2026-09-01',500000,'abono','sucursal'),
+ (1002,101,'2026-09-03',120000,'cargo','web'),
+ (1003,101,'2026-09-15',80000,'cargo','app'),
+ (1004,102,'2026-09-05',200000,'abono','app'),
+ (1005,103,'2026-09-02',400000,'abono','app'),
+ (1006,103,'2026-09-10',45000,'cargo','cajero'),
+ (1007,103,'2026-09-20',30000,'cargo','web'),
+ (1008,104,'2026-08-28',900000,'abono','sucursal'),
+ (1009,104,'2026-09-12',250000,'cargo','web'),
+ (1010,105,'2026-08-15',60000,'cargo','app'),
+ (1011,106,'2026-09-07',150000,'abono','app'),
+ (1012,106,'2026-09-18',150000,'cargo','cajero'),
+ (1013,108,'2026-08-20',75000,'abono','app'),
+ (1014,101,'2026-10-01',40000,'cargo','app');
+`,
+  tablas: [
+    { nombre: "clientes", alias: "c", cols: ["cliente_id", "nombre", "segmento", "region", "fecha_alta"], llaves: ["cliente_id"], nota: "Una fila por cliente. segmento puede venir vacío (NULL)." },
+    { nombre: "cuentas", alias: "cu", cols: ["cuenta_id", "cliente_id", "tipo", "fecha_apertura", "estado"], llaves: ["cuenta_id", "cliente_id"], nota: "Una fila por cuenta. cliente_id dice de quién es." },
+    { nombre: "movimientos", alias: "m", cols: ["mov_id", "cuenta_id", "fecha", "monto", "tipo", "canal"], llaves: ["cuenta_id"], nota: "Una fila por movimiento. cuenta_id dice en qué cuenta ocurrió." }
+  ],
+  niveles: [
+    {
+      id: "n1", titulo: "JOIN: la forma y las llaves",
+      intro: "La forma es siempre la misma: FROM tabla alias JOIN otra_tabla alias ON llave = llave. El alias va después del nombre de la tabla, y la llave es la columna que las dos tablas comparten.",
+      ejercicios: [
+        {
+          id: "j1", titulo: "La forma del JOIN", practica: "JOIN ... ON",
+          enunciado: "Muestra el nombre de cada cliente junto con el tipo y el estado de cada una de sus cuentas.",
+          columnas: "nombre, tipo, estado",
+          pistas: [
+            "La forma: FROM clientes c JOIN cuentas cu ON … El alias (c, cu) se escribe después del nombre de la tabla.",
+            "Las dos tablas comparten la columna cliente_id. Esa es la llave: ON cu.cliente_id = c.cliente_id."
+          ],
+          sol: `SELECT c.nombre, cu.tipo, cu.estado
+FROM clientes c
+JOIN cuentas cu ON cu.cliente_id = c.cliente_id;`,
+          pasos: [
+            { t: "FROM clientes c", d: "Se parte de una tabla. La letra <code>c</code> es su alias (apodo), y se escribe después del nombre.", q: `SELECT c.cliente_id AS "c.cliente_id", c.nombre AS "c.nombre" FROM clientes c`, hl: ["c.cliente_id"] },
+            { t: "JOIN cuentas cu", d: "La segunda tabla, con su alias <code>cu</code>. Su columna <code>cliente_id</code> dice de quién es cada cuenta.", q: `SELECT cu.cuenta_id AS "cu.cuenta_id", cu.cliente_id AS "cu.cliente_id", cu.tipo AS "cu.tipo", cu.estado AS "cu.estado" FROM cuentas cu`, hl: ["cu.cliente_id"] },
+            { t: "ON cu.cliente_id = c.cliente_id", d: "El motor pega cada cuenta con el cliente que tiene el mismo <code>cliente_id</code>. Sale una fila por cada pareja que calza. Felipe (6) no tiene cuentas, así que no aparece.", q: `SELECT c.cliente_id AS "c.cliente_id", c.nombre AS "c.nombre", cu.cliente_id AS "cu.cliente_id", cu.cuenta_id AS "cu.cuenta_id", cu.tipo AS "cu.tipo", cu.estado AS "cu.estado" FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id`, hl: ["c.cliente_id", "cu.cliente_id"] },
+            { t: "SELECT c.nombre, cu.tipo, cu.estado", d: "Al final se eligen las columnas que pide el enunciado, cada una con el alias de su tabla.", q: `SELECT c.nombre, cu.tipo, cu.estado FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id` }
+          ],
+          ojo: "Error típico: poner el alias antes de la tabla (<code>FROM c.clientes</code>). El punto significa «la columna de», así que el motor busca algo llamado <code>clientes</code> dentro de algo llamado <code>c</code>, y no existe.",
+          mal: `SELECT c.nombre, cu.tipo, cu.estado
+FROM c.clientes JOIN cu.cuentas ON c.cliente_id = cu.cliente_id;`
+        },
+        {
+          id: "j2", titulo: "La otra llave", practica: "Elegir la llave correcta",
+          enunciado: "Lista cada movimiento con el tipo de la cuenta en la que ocurrió.",
+          columnas: "mov_id, monto, tipo del movimiento, tipo de la cuenta",
+          pistas: [
+            "¿Qué columna tienen en común movimientos y cuentas? Mírala en el mapa de llaves.",
+            "La llave es cuenta_id. Y como las dos tablas tienen una columna llamada tipo, hay que decir cuál es cuál: m.tipo y cu.tipo."
+          ],
+          sol: `SELECT m.mov_id, m.monto, m.tipo AS tipo_movimiento, cu.tipo AS tipo_cuenta
+FROM movimientos m
+JOIN cuentas cu ON cu.cuenta_id = m.cuenta_id;`,
+          pasos: [
+            { t: "FROM movimientos m", d: "Cada movimiento trae <code>cuenta_id</code>: la cuenta en la que ocurrió.", q: `SELECT m.mov_id AS "m.mov_id", m.cuenta_id AS "m.cuenta_id", m.monto AS "m.monto", m.tipo AS "m.tipo" FROM movimientos m`, hl: ["m.cuenta_id"] },
+            { t: "JOIN cuentas cu ON cu.cuenta_id = m.cuenta_id", d: "Se pega cada movimiento con la cuenta que tiene ese mismo <code>cuenta_id</code>. Las 14 filas de movimientos encuentran su cuenta.", q: `SELECT m.mov_id AS "m.mov_id", m.cuenta_id AS "m.cuenta_id", cu.cuenta_id AS "cu.cuenta_id", m.tipo AS "m.tipo", cu.tipo AS "cu.tipo" FROM movimientos m JOIN cuentas cu ON cu.cuenta_id = m.cuenta_id ORDER BY m.mov_id`, hl: ["m.cuenta_id", "cu.cuenta_id"] },
+            { t: "SELECT con las dos columnas tipo", d: "Hay dos columnas <code>tipo</code>. El alias de tabla le dice al motor cuál quieres, y <code>AS</code> le pone un nombre claro a cada una.", q: `SELECT m.mov_id, m.monto, m.tipo AS tipo_movimiento, cu.tipo AS tipo_cuenta FROM movimientos m JOIN cuentas cu ON cu.cuenta_id = m.cuenta_id ORDER BY m.mov_id` }
+          ],
+          ojo: "Error típico: unir por <code>mov_id</code>. Ese número identifica al movimiento, no a la cuenta. Los mov_id van del 1001 al 1014 y los cuenta_id del 101 al 109: ninguno calza, y salen 0 filas sin ningún mensaje de error.",
+          mal: `SELECT m.mov_id, m.monto, m.tipo, cu.tipo
+FROM movimientos m
+JOIN cuentas cu ON cu.cuenta_id = m.mov_id;`
+        },
+        {
+          id: "j3", titulo: "Tres tablas en cadena", practica: "Dos JOIN seguidos",
+          enunciado: "Para cada movimiento, muestra el nombre del cliente dueño de la cuenta, el mov_id y el monto.",
+          columnas: "nombre, mov_id, monto",
+          pistas: [
+            "clientes y movimientos no comparten ninguna columna. Hay que pasar por cuentas, que conecta con las dos.",
+            "Son dos JOIN seguidos, cada uno con su ON: clientes con cuentas por cliente_id, y cuentas con movimientos por cuenta_id."
+          ],
+          sol: `SELECT c.nombre, m.mov_id, m.monto
+FROM clientes c
+JOIN cuentas cu ON cu.cliente_id = c.cliente_id
+JOIN movimientos m ON m.cuenta_id = cu.cuenta_id;`,
+          pasos: [
+            { t: "FROM clientes c JOIN cuentas cu ON …", d: "Primer eslabón: cada cliente con sus cuentas, por <code>cliente_id</code>.", q: `SELECT c.nombre AS "c.nombre", c.cliente_id AS "c.cliente_id", cu.cliente_id AS "cu.cliente_id", cu.cuenta_id AS "cu.cuenta_id" FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id`, hl: ["c.cliente_id", "cu.cliente_id"] },
+            { t: "JOIN movimientos m ON m.cuenta_id = cu.cuenta_id", d: "Segundo eslabón: a ese resultado se le pegan los movimientos, por <code>cuenta_id</code>. Ahora hay una fila por movimiento. Las cuentas sin movimientos (107 y 109) desaparecen.", q: `SELECT c.nombre AS "c.nombre", cu.cuenta_id AS "cu.cuenta_id", m.cuenta_id AS "m.cuenta_id", m.mov_id AS "m.mov_id", m.monto AS "m.monto" FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id JOIN movimientos m ON m.cuenta_id = cu.cuenta_id ORDER BY m.mov_id`, hl: ["cu.cuenta_id", "m.cuenta_id"] },
+            { t: "SELECT c.nombre, m.mov_id, m.monto", d: "Las columnas pedidas. La tabla cuentas no aparece en el resultado: solo sirvió de puente.", q: `SELECT c.nombre, m.mov_id, m.monto FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id JOIN movimientos m ON m.cuenta_id = cu.cuenta_id ORDER BY m.mov_id` }
+          ],
+          ojo: "Cada JOIN lleva su propio ON, con la llave de ese par de tablas. Después del primer JOIN no se repite la tabla: se sigue directo con <code>JOIN movimientos m ON …</code>.",
+          mal: `SELECT c.nombre, m.mov_id, m.monto
+FROM clientes c JOIN cuentas cu ON c.cliente_id = cu.cliente_id
+cuentas cu JOIN movimientos m ON cu.cuenta_id = m.cuenta_id;`
+        },
+        {
+          id: "j4", titulo: "LEFT JOIN: que no se pierda nadie", practica: "LEFT JOIN",
+          enunciado: "Muestra el nombre de todos los clientes y el cuenta_id de cada una de sus cuentas. Los clientes sin cuentas también deben aparecer, con el cuenta_id vacío.",
+          columnas: "nombre, cuenta_id",
+          pistas: [
+            "Con JOIN a secas, el cliente que no tiene cuentas desaparece. Hay un JOIN que conserva todas las filas de la tabla de la izquierda.",
+            "FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id. La tabla que quieres conservar completa va antes del LEFT JOIN."
+          ],
+          sol: `SELECT c.nombre, cu.cuenta_id
+FROM clientes c
+LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id;`,
+          pasos: [
+            { t: "Con JOIN a secas (INNER)", d: "Solo salen las parejas que calzan: 9 filas. Felipe no tiene cuentas y no aparece.", q: `SELECT c.nombre AS "c.nombre", c.cliente_id AS "c.cliente_id", cu.cliente_id AS "cu.cliente_id", cu.cuenta_id AS "cu.cuenta_id" FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id`, hl: ["c.cliente_id", "cu.cliente_id"] },
+            { t: "Con LEFT JOIN", d: "Se conservan todas las filas de la tabla izquierda (clientes). Al que no encuentra pareja, las columnas de cuentas se le rellenan con NULL: mira la fila de Felipe.", q: `SELECT c.nombre AS "c.nombre", c.cliente_id AS "c.cliente_id", cu.cliente_id AS "cu.cliente_id", cu.cuenta_id AS "cu.cuenta_id" FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id`, hl: ["c.cliente_id", "cu.cliente_id"] },
+            { t: "SELECT c.nombre, cu.cuenta_id", d: "10 filas: las 9 de antes más Felipe con el cuenta_id vacío.", q: `SELECT c.nombre, cu.cuenta_id FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id` }
+          ],
+          ojo: "«Izquierda» es la tabla que va antes del LEFT JOIN. Si las inviertes (<code>FROM cuentas cu LEFT JOIN clientes c</code>), lo que se conserva son las cuentas, y Felipe vuelve a desaparecer.",
+          mal: `SELECT c.nombre, cu.cuenta_id
+FROM cuentas cu
+LEFT JOIN clientes c ON cu.cliente_id = c.cliente_id;`
+        },
+        {
+          id: "j5", titulo: "Los que no tienen", practica: "LEFT JOIN + IS NULL",
+          enunciado: "Muestra el nombre de los clientes que no tienen ninguna cuenta.",
+          columnas: "nombre",
+          pistas: [
+            "Parte del LEFT JOIN del ejercicio anterior y fíjate cómo se ve la fila de un cliente sin cuentas.",
+            "En esa fila las columnas de cuentas vienen vacías. Quédate solo con esas: WHERE cu.cuenta_id IS NULL."
+          ],
+          sol: `SELECT c.nombre
+FROM clientes c
+LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id
+WHERE cu.cuenta_id IS NULL;`,
+          pasos: [
+            { t: "LEFT JOIN completo", d: "Todos los clientes con sus cuentas. El único con las columnas de cuentas en NULL es el que no tiene ninguna.", q: `SELECT c.nombre AS "c.nombre", cu.cuenta_id AS "cu.cuenta_id", cu.tipo AS "cu.tipo" FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id`, hl: ["cu.cuenta_id"] },
+            { t: "WHERE cu.cuenta_id IS NULL", d: "El filtro deja solo las filas donde no hubo pareja.", q: `SELECT c.nombre FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id WHERE cu.cuenta_id IS NULL` }
+          ],
+          ojo: "Con <code>= NULL</code> no funciona. NULL significa «no se sabe», y nada es igual a algo que no se sabe. Se pregunta con <code>IS NULL</code>.",
+          mal: `SELECT c.nombre
+FROM clientes c
+LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id
+WHERE cu.cuenta_id = NULL;`
+        },
+        {
+          id: "j6", titulo: "La condición: ¿en el ON o en el WHERE?", practica: "ON contra WHERE",
+          enunciado: "Muestra el nombre de todos los clientes y el cuenta_id de sus cuentas de tipo 'ahorro'. Los clientes que no tienen cuenta de ahorro deben aparecer igual, con el cuenta_id vacío.",
+          columnas: "nombre, cuenta_id",
+          pistas: [
+            "Si filtras con WHERE cu.tipo = 'ahorro', ¿qué pasa con las filas donde cu.tipo viene en NULL?",
+            "La condición sobre la tabla derecha va dentro del ON: … ON cu.cliente_id = c.cliente_id AND cu.tipo = 'ahorro'."
+          ],
+          sol: `SELECT c.nombre, cu.cuenta_id
+FROM clientes c
+LEFT JOIN cuentas cu
+       ON cu.cliente_id = c.cliente_id
+      AND cu.tipo = 'ahorro';`,
+          pasos: [
+            { t: "LEFT JOIN sin condición extra", d: "El punto de partida: todos los clientes con todas sus cuentas.", q: `SELECT c.nombre AS "c.nombre", cu.cuenta_id AS "cu.cuenta_id", cu.tipo AS "cu.tipo" FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id ORDER BY c.cliente_id, cu.cuenta_id`, hl: ["cu.tipo"] },
+            { t: "Condición en el WHERE", d: "<code>WHERE cu.tipo = 'ahorro'</code> se aplica después de pegar las tablas, y elimina toda fila que no sea de ahorro, incluidas las que tienen NULL. Quedan 2 filas: el LEFT JOIN terminó funcionando como un JOIN a secas.", q: `SELECT c.nombre AS "c.nombre", cu.cuenta_id AS "cu.cuenta_id", cu.tipo AS "cu.tipo" FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id WHERE cu.tipo = 'ahorro' ORDER BY c.cliente_id`, hl: ["cu.tipo"] },
+            { t: "Condición en el ON", d: "Dentro del ON, la condición decide qué cuentas se pegan. El cliente que no tiene ninguna de ahorro se conserva igual, con NULL. Quedan los 7 clientes.", q: `SELECT c.nombre AS "c.nombre", cu.cuenta_id AS "cu.cuenta_id", cu.tipo AS "cu.tipo" FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id AND cu.tipo = 'ahorro' ORDER BY c.cliente_id`, hl: ["cu.tipo"] }
+          ],
+          ojo: "En un LEFT JOIN, una condición sobre la tabla derecha puesta en el WHERE borra las filas con NULL. Si la condición decide qué filas de la derecha se pegan, va en el ON.",
+          mal: `SELECT c.nombre, cu.cuenta_id
+FROM clientes c
+LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id
+WHERE cu.tipo = 'ahorro';`
+        },
+        {
+          id: "j7", titulo: "El mismo patrón, con la otra llave", practica: "LEFT JOIN + IS NULL",
+          enunciado: "Muestra las cuentas que no tienen ningún movimiento.",
+          columnas: "cuenta_id, tipo",
+          pistas: [
+            "Es el patrón de «Los que no tienen», cambiando las tablas. ¿Cuál quieres conservar completa?",
+            "FROM cuentas cu LEFT JOIN movimientos m ON m.cuenta_id = cu.cuenta_id, y después quedarte con las filas donde m.mov_id IS NULL."
+          ],
+          sol: `SELECT cu.cuenta_id, cu.tipo
+FROM cuentas cu
+LEFT JOIN movimientos m ON m.cuenta_id = cu.cuenta_id
+WHERE m.mov_id IS NULL;`,
+          pasos: [
+            { t: "FROM cuentas cu LEFT JOIN movimientos m ON …", d: "Todas las cuentas con sus movimientos. Las cuentas 107 y 109 no tienen ninguno, y traen NULL en las columnas de movimientos.", q: `SELECT cu.cuenta_id AS "cu.cuenta_id", cu.tipo AS "cu.tipo", m.cuenta_id AS "m.cuenta_id", m.mov_id AS "m.mov_id" FROM cuentas cu LEFT JOIN movimientos m ON m.cuenta_id = cu.cuenta_id ORDER BY cu.cuenta_id, m.mov_id`, hl: ["cu.cuenta_id", "m.cuenta_id"] },
+            { t: "WHERE m.mov_id IS NULL", d: "Quedan solo las cuentas que no encontraron pareja.", q: `SELECT cu.cuenta_id, cu.tipo FROM cuentas cu LEFT JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.mov_id IS NULL` }
+          ],
+          ojo: "La tabla que quieres ver completa va a la izquierda. Aquí la pregunta es por cuentas, así que cuentas va primero."
+        }
+      ]
+    },
+    {
+      id: "n2", titulo: "Agrupar: GROUP BY, WHERE y HAVING",
+      intro: "WHERE filtra filas antes de agrupar. HAVING filtra grupos después de agrupar, y por eso puede usar COUNT o SUM. El orden al escribir es WHERE, GROUP BY, HAVING.",
+      ejercicios: [
+        {
+          id: "g1", titulo: "Contar por grupo", practica: "GROUP BY + COUNT",
+          enunciado: "¿Cuántas cuentas hay de cada tipo?",
+          columnas: "tipo, cantidad",
+          pistas: [
+            "GROUP BY junta las filas que tienen el mismo valor en una columna. COUNT(*) cuenta cuántas filas quedaron en cada grupo.",
+            "SELECT tipo, COUNT(*) AS cantidad FROM cuentas GROUP BY …"
+          ],
+          sol: `SELECT tipo, COUNT(*) AS cantidad
+FROM cuentas
+GROUP BY tipo;`,
+          pasos: [
+            { t: "FROM cuentas", d: "Las 9 cuentas, ordenadas por tipo para que se vean los grupos que se van a formar.", q: `SELECT cuenta_id, tipo, estado FROM cuentas ORDER BY tipo, cuenta_id`, hl: ["tipo"] },
+            { t: "GROUP BY tipo, con COUNT(*)", d: "Cada grupo se aplasta en una sola fila. COUNT(*) dice cuántas filas tenía.", q: `SELECT tipo, COUNT(*) AS cantidad FROM cuentas GROUP BY tipo ORDER BY tipo` }
+          ],
+          ojo: "Dos detalles de forma. El nombre que pones con AS no puede llevar espacios: <code>AS cantidad</code> o <code>AS numero_de_cuentas</code>. Y a COUNT no se le pasa el nombre de la tabla: <code>COUNT(*)</code> cuenta filas.",
+          mal: `SELECT tipo, COUNT(cuentas) AS numero de cuentas
+FROM cuentas
+GROUP BY tipo;`
+        },
+        {
+          id: "g2", titulo: "Filtrar filas antes de agrupar", practica: "WHERE + GROUP BY",
+          enunciado: "¿Cuántas cuentas activas hay de cada tipo?",
+          columnas: "tipo, cantidad",
+          pistas: [
+            "Primero hay que dejar solo las cuentas activas, y después contar por tipo. ¿Qué cláusula filtra filas?",
+            "WHERE estado = 'activa' va antes del GROUP BY."
+          ],
+          sol: `SELECT tipo, COUNT(*) AS cantidad
+FROM cuentas
+WHERE estado = 'activa'
+GROUP BY tipo;`,
+          pasos: [
+            { t: "FROM cuentas", d: "Las 9 cuentas, con su estado.", q: `SELECT cuenta_id, tipo, estado FROM cuentas ORDER BY tipo, cuenta_id`, hl: ["estado"] },
+            { t: "WHERE estado = 'activa'", d: "El filtro saca las dos cerradas (105 y 108). Quedan 7 filas.", q: `SELECT cuenta_id, tipo, estado FROM cuentas WHERE estado = 'activa' ORDER BY tipo, cuenta_id`, hl: ["tipo"] },
+            { t: "GROUP BY tipo, con COUNT(*)", d: "Recién ahora se agrupa y se cuenta, sobre las filas que sobrevivieron.", q: `SELECT tipo, COUNT(*) AS cantidad FROM cuentas WHERE estado = 'activa' GROUP BY tipo ORDER BY tipo` }
+          ],
+          ojo: "Los textos se comparan letra por letra. <code>'activa'</code> no es igual a <code>'activo'</code> ni a <code>'Activa'</code>, y el motor no avisa: simplemente no encuentra nada.",
+          mal: `SELECT tipo, COUNT(*) AS cantidad
+FROM cuentas
+WHERE estado = 'activo'
+GROUP BY tipo;`
+        },
+        {
+          id: "g3", titulo: "HAVING: filtrar grupos", practica: "HAVING",
+          enunciado: "Muestra los tipos de cuenta que tienen 3 cuentas o más.",
+          columnas: "tipo, cantidad",
+          pistas: [
+            "La condición es sobre el conteo, y el conteo no existe hasta después de agrupar. WHERE actúa antes.",
+            "Después del GROUP BY: HAVING COUNT(*) >= 3."
+          ],
+          sol: `SELECT tipo, COUNT(*) AS cantidad
+FROM cuentas
+GROUP BY tipo
+HAVING COUNT(*) >= 3;`,
+          pasos: [
+            { t: "GROUP BY tipo, con COUNT(*)", d: "Los tres grupos con su conteo.", q: `SELECT tipo, COUNT(*) AS cantidad FROM cuentas GROUP BY tipo ORDER BY tipo`, hl: ["cantidad"] },
+            { t: "HAVING COUNT(*) >= 3", d: "HAVING revisa cada grupo ya formado y deja pasar solo los que cumplen. Sale el grupo de ahorro, que tiene 2.", q: `SELECT tipo, COUNT(*) AS cantidad FROM cuentas GROUP BY tipo HAVING COUNT(*) >= 3 ORDER BY tipo` }
+          ],
+          ojo: "Un conteo no se puede usar en el WHERE: en ese momento todavía no hay grupos. Y ojo con no confundirlo con LIKE, que es lo que busca un texto dentro de otro (<code>WHERE nombre LIKE '%Rojas%'</code>). HAVING no tiene nada que ver con textos.",
+          mal: `SELECT tipo, COUNT(*) AS cantidad
+FROM cuentas
+WHERE COUNT(*) >= 3
+GROUP BY tipo;`
+        },
+        {
+          id: "g4", titulo: "WHERE y HAVING en la misma consulta", practica: "WHERE + HAVING",
+          enunciado: "Calcula el total de cargos de cada cuenta y muestra solo las cuentas cuyo total de cargos supera 100000.",
+          columnas: "cuenta_id, total_cargos",
+          pistas: [
+            "Hay dos filtros distintos. Uno es sobre cada movimiento (que sea cargo) y el otro sobre el total de cada cuenta.",
+            "WHERE tipo = 'cargo' antes del GROUP BY cuenta_id, y HAVING SUM(monto) > 100000 después."
+          ],
+          sol: `SELECT cuenta_id, SUM(monto) AS total_cargos
+FROM movimientos
+WHERE tipo = 'cargo'
+GROUP BY cuenta_id
+HAVING SUM(monto) > 100000;`,
+          pasos: [
+            { t: "WHERE tipo = 'cargo'", d: "Filtro sobre filas: quedan solo los cargos, 8 movimientos.", q: `SELECT mov_id, cuenta_id, monto, tipo FROM movimientos WHERE tipo = 'cargo' ORDER BY cuenta_id, mov_id`, hl: ["cuenta_id"] },
+            { t: "GROUP BY cuenta_id, con SUM(monto)", d: "Un grupo por cuenta, con la suma de sus cargos.", q: `SELECT cuenta_id, SUM(monto) AS total_cargos FROM movimientos WHERE tipo = 'cargo' GROUP BY cuenta_id ORDER BY cuenta_id`, hl: ["total_cargos"] },
+            { t: "HAVING SUM(monto) > 100000", d: "Filtro sobre grupos: salen las cuentas 103 (75000) y 105 (60000).", q: `SELECT cuenta_id, SUM(monto) AS total_cargos FROM movimientos WHERE tipo = 'cargo' GROUP BY cuenta_id HAVING SUM(monto) > 100000 ORDER BY cuenta_id` }
+          ],
+          ojo: "Si pones <code>monto > 100000</code> en el WHERE, filtras cada movimiento por separado antes de sumar. La cuenta 101 tiene tres cargos que suman 240000, pero solo uno pasa ese filtro, y su total sale en 120000.",
+          mal: `SELECT cuenta_id, SUM(monto) AS total_cargos
+FROM movimientos
+WHERE tipo = 'cargo' AND monto > 100000
+GROUP BY cuenta_id;`
+        },
+        {
+          id: "g5", titulo: "Contar sin perder a los que tienen cero", practica: "LEFT JOIN + COUNT(columna)",
+          enunciado: "Muestra el nombre de cada cliente y cuántas cuentas cerradas tiene. Los que no tienen ninguna deben aparecer con 0.",
+          columnas: "nombre, cerradas",
+          pistas: [
+            "Junta dos cosas que ya hiciste: el LEFT JOIN con la condición en el ON (nivel 1, ejercicio 6) y el GROUP BY con COUNT.",
+            "Cuenta una columna de la tabla derecha, COUNT(cu.cuenta_id), y agrupa por el cliente."
+          ],
+          sol: `SELECT c.nombre, COUNT(cu.cuenta_id) AS cerradas
+FROM clientes c
+LEFT JOIN cuentas cu
+       ON cu.cliente_id = c.cliente_id
+      AND cu.estado = 'cerrada'
+GROUP BY c.cliente_id, c.nombre;`,
+          pasos: [
+            { t: "LEFT JOIN con la condición en el ON", d: "Todos los clientes. Solo a los que tienen una cuenta cerrada se les pega una fila de cuentas; el resto queda con NULL.", q: `SELECT c.cliente_id AS "c.cliente_id", c.nombre AS "c.nombre", cu.cuenta_id AS "cu.cuenta_id", cu.estado AS "cu.estado" FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id AND cu.estado = 'cerrada' ORDER BY c.cliente_id`, hl: ["cu.cuenta_id"] },
+            { t: "GROUP BY cliente, con COUNT(cu.cuenta_id)", d: "COUNT de una columna cuenta solo los valores que no son NULL. Por eso los clientes sin cuentas cerradas dan 0.", q: `SELECT c.nombre, COUNT(cu.cuenta_id) AS cerradas FROM clientes c LEFT JOIN cuentas cu ON cu.cliente_id = c.cliente_id AND cu.estado = 'cerrada' GROUP BY c.cliente_id, c.nombre ORDER BY c.cliente_id` }
+          ],
+          ojo: "<code>COUNT(*)</code> cuenta filas, y un cliente sin cuentas cerradas igual tiene una fila (la que trae NULL). Con COUNT(*) todos darían 1 o más. <code>COUNT(cu.cuenta_id)</code> ignora los NULL.",
+          mal: `SELECT c.nombre, COUNT(*) AS cerradas
+FROM clientes c
+LEFT JOIN cuentas cu
+       ON cu.cliente_id = c.cliente_id
+      AND cu.estado = 'cerrada'
+GROUP BY c.cliente_id, c.nombre;`
+        },
+        {
+          id: "g6", titulo: "Sumar a través de dos JOIN", practica: "JOIN + GROUP BY",
+          enunciado: "Calcula el total de abonos de cada cliente. Solo los clientes que tienen al menos un abono.",
+          columnas: "nombre, total_abonos",
+          pistas: [
+            "Los montos están en movimientos y los nombres en clientes. Es la cadena de tres tablas del nivel 1.",
+            "Después de los dos JOIN: WHERE m.tipo = 'abono', y GROUP BY por cliente con SUM(m.monto)."
+          ],
+          sol: `SELECT c.nombre, SUM(m.monto) AS total_abonos
+FROM clientes c
+JOIN cuentas cu ON cu.cliente_id = c.cliente_id
+JOIN movimientos m ON m.cuenta_id = cu.cuenta_id
+WHERE m.tipo = 'abono'
+GROUP BY c.cliente_id, c.nombre;`,
+          pasos: [
+            { t: "Los dos JOIN y el WHERE", d: "Una fila por cada abono, con el nombre de su dueño.", q: `SELECT c.nombre AS "c.nombre", cu.cuenta_id AS "cu.cuenta_id", m.mov_id AS "m.mov_id", m.tipo AS "m.tipo", m.monto AS "m.monto" FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'abono' ORDER BY c.cliente_id, m.mov_id`, hl: ["c.nombre"] },
+            { t: "GROUP BY cliente, con SUM(m.monto)", d: "Ana tiene abonos en dos cuentas distintas (101 y 102) y se suman juntos, porque el grupo es el cliente.", q: `SELECT c.nombre, SUM(m.monto) AS total_abonos FROM clientes c JOIN cuentas cu ON cu.cliente_id = c.cliente_id JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'abono' GROUP BY c.cliente_id, c.nombre ORDER BY c.cliente_id` }
+          ],
+          ojo: "En BigQuery, toda columna del SELECT que no esté dentro de una función como SUM o COUNT tiene que estar en el GROUP BY. Este motor es más permisivo y a veces deja pasar el descuido. Acostúmbrate a la forma estricta."
+        }
+      ]
+    },
+    {
+      id: "n3", titulo: "NULL, AND y OR",
+      intro: "NULL significa «no se sabe». Cualquier comparación con NULL da «no se sabe», y WHERE solo deja pasar lo que es verdadero. Por eso los vacíos se preguntan aparte, con IS NULL.",
+      ejercicios: [
+        {
+          id: "v1", titulo: "Buscar los vacíos", practica: "IS NULL",
+          enunciado: "Muestra el nombre de los clientes que no tienen segmento.",
+          columnas: "nombre",
+          pistas: [
+            "Un segmento vacío no es un texto en blanco: es NULL.",
+            "WHERE segmento IS NULL."
+          ],
+          sol: `SELECT nombre
+FROM clientes
+WHERE segmento IS NULL;`,
+          pasos: [
+            { t: "FROM clientes", d: "Dos clientes tienen el segmento en NULL.", q: `SELECT nombre, segmento FROM clientes`, hl: ["segmento"] },
+            { t: "WHERE segmento IS NULL", d: "IS NULL es la única forma de preguntar por un vacío.", q: `SELECT nombre FROM clientes WHERE segmento IS NULL` }
+          ],
+          ojo: "<code>segmento = NULL</code> no da error, pero nunca es verdadero: devuelve 0 filas.",
+          mal: `SELECT nombre
+FROM clientes
+WHERE segmento = NULL;`
+        },
+        {
+          id: "v2", titulo: "El != que deja fuera a los vacíos", practica: "!= con NULL, y OR",
+          enunciado: "Muestra el nombre de los clientes cuyo segmento no es 'Masivo'. Incluye a los que no tienen segmento.",
+          columnas: "nombre",
+          pistas: [
+            "segmento != 'Masivo' deja fuera a los que tienen NULL. Hay que sumarlos con una segunda condición.",
+            "Una fila tiene que pasar si cumple una condición o la otra. ¿AND u OR?"
+          ],
+          sol: `SELECT nombre
+FROM clientes
+WHERE segmento != 'Masivo'
+   OR segmento IS NULL;`,
+          pasos: [
+            { t: "Cómo evalúa el motor cada condición", d: "1 es verdadero, 0 es falso, y NULL es «no se sabe». Mira a Bruno y Elena: para ellos <code>segmento != 'Masivo'</code> da NULL, no verdadero.", q: `SELECT nombre, segmento, segmento != 'Masivo' AS "segmento != 'Masivo'", segmento IS NULL AS "segmento IS NULL" FROM clientes`, hl: ["segmento != 'Masivo'", "segmento IS NULL"] },
+            { t: "Unidas con AND", d: "AND exige que las dos sean verdaderas en la misma fila. Ninguna fila tiene un 1 en las dos columnas: salen 0 filas.", q: `SELECT nombre, segmento, (segmento != 'Masivo' AND segmento IS NULL) AS "las dos con AND" FROM clientes`, hl: ["las dos con AND"] },
+            { t: "Unidas con OR", d: "OR deja pasar la fila si al menos una es verdadera. Pasan los 5 que tienen un 1.", q: `SELECT nombre, segmento, (segmento != 'Masivo' OR segmento IS NULL) AS "las dos con OR" FROM clientes`, hl: ["las dos con OR"] }
+          ],
+          ojo: "Un segmento no puede ser distinto de 'Masivo' y estar vacío al mismo tiempo. Con AND esta consulta devuelve 0 filas. Es OR.",
+          mal: `SELECT nombre
+FROM clientes
+WHERE segmento != 'Masivo'
+  AND segmento IS NULL;`
+        },
+        {
+          id: "v3", titulo: "AND y OR juntos: los paréntesis", practica: "Precedencia de AND y OR",
+          enunciado: "Muestra el nombre de los clientes de la región 'Sur' cuyo segmento es 'Premium' o está vacío.",
+          columnas: "nombre",
+          pistas: [
+            "Son dos exigencias: ser de la región Sur, y además cumplir una de dos cosas sobre el segmento.",
+            "Las dos opciones del segmento van juntas entre paréntesis: region = 'Sur' AND ( … OR … )."
+          ],
+          sol: `SELECT nombre
+FROM clientes
+WHERE region = 'Sur'
+  AND (segmento = 'Premium' OR segmento IS NULL);`,
+          pasos: [
+            { t: "Las tres condiciones por separado", d: "Cada columna muestra si esa condición se cumple en cada fila.", q: `SELECT nombre, region, segmento, region = 'Sur' AS "region = 'Sur'", segmento = 'Premium' AS "segmento = 'Premium'", segmento IS NULL AS "segmento IS NULL" FROM clientes`, hl: ["region = 'Sur'"] },
+            { t: "Sin paréntesis", d: "AND se resuelve antes que OR, igual que la multiplicación antes que la suma. Queda (Sur y Premium) o (vacío): se cuela Elena, que es del Norte.", q: `SELECT nombre, region, segmento FROM clientes WHERE region = 'Sur' AND segmento = 'Premium' OR segmento IS NULL`, hl: ["region"] },
+            { t: "Con paréntesis", d: "Los paréntesis agrupan las dos opciones del segmento, y la región se exige siempre.", q: `SELECT nombre, region, segmento FROM clientes WHERE region = 'Sur' AND (segmento = 'Premium' OR segmento IS NULL)`, hl: ["region"] }
+          ],
+          ojo: "Cuando mezcles AND y OR, pon paréntesis siempre, aunque creas que no hacen falta. Es el error más silencioso: la consulta corre y devuelve filas de más.",
+          mal: `SELECT nombre
+FROM clientes
+WHERE region = 'Sur'
+  AND segmento = 'Premium' OR segmento IS NULL;`
+        },
+        {
+          id: "v4", titulo: "Reemplazar el vacío por un texto", practica: "COALESCE",
+          enunciado: "Muestra el nombre y el segmento de todos los clientes. Donde el segmento esté vacío, que diga 'Sin segmento'.",
+          columnas: "nombre, segmento",
+          pistas: [
+            "Hay una función que recibe una lista de valores y devuelve el primero que no sea NULL.",
+            "COALESCE(segmento, 'Sin segmento') AS segmento."
+          ],
+          sol: `SELECT nombre, COALESCE(segmento, 'Sin segmento') AS segmento
+FROM clientes;`,
+          pasos: [
+            { t: "FROM clientes", d: "El segmento tal como viene.", q: `SELECT nombre, segmento FROM clientes`, hl: ["segmento"] },
+            { t: "COALESCE(segmento, 'Sin segmento')", d: "Si el primer valor es NULL, usa el siguiente. Si no, lo deja igual.", q: `SELECT nombre, COALESCE(segmento, 'Sin segmento') AS segmento FROM clientes`, hl: ["segmento"] }
+          ],
+          ojo: "COALESCE existe igual en BigQuery. Allá también se usa IFNULL(segmento, 'Sin segmento'), que hace lo mismo con dos valores."
+        }
+      ]
+    },
+    {
+      id: "n4", titulo: "Subconsultas y CTE",
+      intro: "Una subconsulta es una consulta entre paréntesis dentro de otra. Un CTE (WITH nombre AS …) es lo mismo, pero con nombre y escrito arriba: se arma un resultado intermedio y después se usa como si fuera una tabla.",
+      ejercicios: [
+        {
+          id: "s1", titulo: "Comparar contra un número calculado", practica: "Subconsulta en el WHERE",
+          enunciado: "Muestra los movimientos cuyo monto es mayor que el monto promedio de todos los movimientos.",
+          columnas: "mov_id, monto",
+          pistas: [
+            "Primero escribe, sola, la consulta que calcula el promedio. Devuelve un único número.",
+            "Esa consulta va entre paréntesis en el lugar del número: WHERE monto > (SELECT AVG(monto) FROM movimientos)."
+          ],
+          sol: `SELECT mov_id, monto
+FROM movimientos
+WHERE monto > (SELECT AVG(monto) FROM movimientos);`,
+          pasos: [
+            { t: "La consulta de adentro, sola", d: "Devuelve una fila con un número: el promedio de los 14 montos.", q: `SELECT AVG(monto) AS promedio FROM movimientos`, hl: ["promedio"] },
+            { t: "La de afuera la usa como si fuera un número", d: "El motor resuelve primero el paréntesis y después compara cada movimiento contra ese valor.", q: `SELECT mov_id, monto, (SELECT AVG(monto) FROM movimientos) AS promedio, monto > (SELECT AVG(monto) FROM movimientos) AS "¿monto > promedio?" FROM movimientos ORDER BY mov_id`, hl: ["¿monto > promedio?"] },
+            { t: "Resultado", d: "Quedan los movimientos que están sobre el promedio.", q: `SELECT mov_id, monto FROM movimientos WHERE monto > (SELECT AVG(monto) FROM movimientos) ORDER BY mov_id` }
+          ],
+          ojo: "No se puede escribir <code>WHERE monto > AVG(monto)</code>: AVG necesita mirar todas las filas, y el WHERE trabaja fila por fila. La subconsulta lo calcula aparte y entrega el número.",
+          mal: `SELECT mov_id, monto
+FROM movimientos
+WHERE monto > AVG(monto);`
+        },
+        {
+          id: "s2", titulo: "Un resultado intermedio con nombre", practica: "CTE (WITH)",
+          enunciado: "Usando un CTE, calcula el total de cargos de cada cliente y muestra los clientes cuyo total supera 100000.",
+          columnas: "nombre, total_cargos",
+          pistas: [
+            "Arma primero la consulta que da cliente_id y total de cargos (cuentas con movimientos, agrupando por cliente_id). Pruébala sola.",
+            "Envuélvela: WITH cargos_por_cliente AS ( … ). Después úsala como una tabla: únela con clientes y filtra con WHERE total_cargos > 100000."
+          ],
+          sol: `WITH cargos_por_cliente AS (
+  SELECT cu.cliente_id, SUM(m.monto) AS total_cargos
+  FROM cuentas cu
+  JOIN movimientos m ON m.cuenta_id = cu.cuenta_id
+  WHERE m.tipo = 'cargo'
+  GROUP BY cu.cliente_id
+)
+SELECT c.nombre, t.total_cargos
+FROM cargos_por_cliente t
+JOIN clientes c ON c.cliente_id = t.cliente_id
+WHERE t.total_cargos > 100000;`,
+          pasos: [
+            { t: "El cuerpo del CTE, solo", d: "Es una consulta normal de las del nivel 2. Devuelve una tabla chica: un total por cliente.", q: `SELECT cu.cliente_id, SUM(m.monto) AS total_cargos FROM cuentas cu JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'cargo' GROUP BY cu.cliente_id ORDER BY cu.cliente_id`, hl: ["cliente_id"] },
+            { t: "WITH cargos_por_cliente AS ( … )", d: "El WITH solo le pone nombre a ese resultado. Desde aquí se usa como una tabla más, y se une con clientes por <code>cliente_id</code>.", q: `WITH cargos_por_cliente AS (SELECT cu.cliente_id, SUM(m.monto) AS total_cargos FROM cuentas cu JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'cargo' GROUP BY cu.cliente_id) SELECT t.cliente_id AS "t.cliente_id", c.cliente_id AS "c.cliente_id", c.nombre AS "c.nombre", t.total_cargos AS "t.total_cargos" FROM cargos_por_cliente t JOIN clientes c ON c.cliente_id = t.cliente_id ORDER BY t.cliente_id`, hl: ["t.cliente_id", "c.cliente_id"] },
+            { t: "WHERE t.total_cargos > 100000", d: "En la tabla del CTE, total_cargos ya es una columna cualquiera. Por eso aquí se filtra con WHERE.", q: `WITH cargos_por_cliente AS (SELECT cu.cliente_id, SUM(m.monto) AS total_cargos FROM cuentas cu JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'cargo' GROUP BY cu.cliente_id) SELECT c.nombre, t.total_cargos FROM cargos_por_cliente t JOIN clientes c ON c.cliente_id = t.cliente_id WHERE t.total_cargos > 100000 ORDER BY t.cliente_id` }
+          ],
+          ojo: "Un CTE no hace nada que no pudieras hacer de otra forma. Sirve para partir un problema en pasos que se leen de arriba hacia abajo, y para probar cada paso por separado."
+        },
+        {
+          id: "s3", titulo: "El promedio de un total", practica: "CTE + subconsulta",
+          enunciado: "Muestra los clientes cuyo total de abonos es mayor que el promedio del total de abonos por cliente.",
+          columnas: "nombre, total_abonos",
+          pistas: [
+            "Son tres pasos: el total de abonos de cada cliente, el promedio de esos totales, y la comparación. Parte por un CTE con el primero.",
+            "Con el CTE abonos_por_cliente armado, el promedio es una subconsulta sobre él: WHERE total_abonos > (SELECT AVG(total_abonos) FROM abonos_por_cliente)."
+          ],
+          sol: `WITH abonos_por_cliente AS (
+  SELECT cu.cliente_id, SUM(m.monto) AS total_abonos
+  FROM cuentas cu
+  JOIN movimientos m ON m.cuenta_id = cu.cuenta_id
+  WHERE m.tipo = 'abono'
+  GROUP BY cu.cliente_id
+)
+SELECT c.nombre, t.total_abonos
+FROM abonos_por_cliente t
+JOIN clientes c ON c.cliente_id = t.cliente_id
+WHERE t.total_abonos > (SELECT AVG(total_abonos) FROM abonos_por_cliente);`,
+          pasos: [
+            { t: "Paso 1: el total de abonos por cliente (el CTE)", d: "Cinco clientes tienen abonos. Esta tabla es la base de todo lo demás.", q: `SELECT cu.cliente_id, SUM(m.monto) AS total_abonos FROM cuentas cu JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'abono' GROUP BY cu.cliente_id ORDER BY cu.cliente_id`, hl: ["total_abonos"] },
+            { t: "Paso 2: el promedio de esos totales", d: "Se promedia la tabla del paso 1, que tiene 5 filas. No los 6 abonos sueltos.", q: `WITH abonos_por_cliente AS (SELECT cu.cliente_id, SUM(m.monto) AS total_abonos FROM cuentas cu JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'abono' GROUP BY cu.cliente_id) SELECT AVG(total_abonos) AS promedio_de_los_totales, COUNT(*) AS clientes FROM abonos_por_cliente`, hl: ["promedio_de_los_totales"] },
+            { t: "Paso 3: comparar cada total con ese promedio", d: "Se usa el CTE dos veces: una como tabla y otra dentro de la subconsulta.", q: `WITH abonos_por_cliente AS (SELECT cu.cliente_id, SUM(m.monto) AS total_abonos FROM cuentas cu JOIN movimientos m ON m.cuenta_id = cu.cuenta_id WHERE m.tipo = 'abono' GROUP BY cu.cliente_id) SELECT c.nombre, t.total_abonos, (SELECT AVG(total_abonos) FROM abonos_por_cliente) AS promedio, t.total_abonos > (SELECT AVG(total_abonos) FROM abonos_por_cliente) AS "¿sobre el promedio?" FROM abonos_por_cliente t JOIN clientes c ON c.cliente_id = t.cliente_id ORDER BY t.cliente_id`, hl: ["¿sobre el promedio?"] }
+          ],
+          ojo: "El promedio pedido es el de los totales por cliente, no el de los montos sueltos. Si comparas contra <code>AVG(monto)</code> de los abonos, el número baja y se cuela Bruno.",
+          mal: `SELECT c.nombre, SUM(m.monto) AS total_abonos
+FROM clientes c
+JOIN cuentas cu ON cu.cliente_id = c.cliente_id
+JOIN movimientos m ON m.cuenta_id = cu.cuenta_id
+WHERE m.tipo = 'abono'
+GROUP BY c.cliente_id, c.nombre
+HAVING SUM(m.monto) > (SELECT AVG(monto) FROM movimientos WHERE tipo = 'abono');`
+        }
+      ]
+    }
+  ]
+};
+
+</script>
+<script>
+(function () {
+  "use strict";
+  var CLAVE = "taller-sql-v1";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  function el(tag, attrs) {
+    var n = document.createElement(tag), i, k;
+    if (attrs) for (k in attrs) {
+      if (k === "class") n.className = attrs[k];
+      else if (k === "html") n.innerHTML = attrs[k];
+      else if (k === "text") n.textContent = attrs[k];
+      else if (k.slice(0, 2) === "on") n.addEventListener(k.slice(2), attrs[k]);
+      else if (attrs[k] === true) n.setAttribute(k, "");
+      else if (attrs[k] !== false && attrs[k] != null) n.setAttribute(k, attrs[k]);
+    }
+    for (i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null || c === false) continue;
+      n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return n;
+  }
+
+  /* ---------- Datos y estructura ---------- */
+  var ESQ = { nba: ESQUEMA_NBA, banco: PRACTICA.esquema };
+  var TABLAS = { nba: TABLAS_NBA, banco: PRACTICA.tablas };
+  var CONEX = { nba: CONEXIONES_NBA, banco: ["cuentas.cliente_id = clientes.cliente_id", "movimientos.cuenta_id = cuentas.cuenta_id"] };
+  var ejBanco = [];
+  PRACTICA.niveles.forEach(function (nv) { nv.ejercicios.forEach(function (e, j) { ejBanco.push(Object.assign({ grupo: j === 0 ? nv.titulo : null }, e)); }); });
+  var MODS = MODULOS_NBA.map(function (m) { return Object.assign({ esq: "nba" }, m); }).concat([{
+    id: "banco", esq: "banco", titulo: "Datos de trabajo: el banco",
+    intro: "Los mismos temas, con datos que se parecen a los de tu trabajo: clientes, cuentas y movimientos. En la entrevista los datos van a ser de este tipo. Aquí sigue tu avance de antes.",
+    aprender: [], practicar: ejBanco
+  }]);
+  var TODOS = [], SEC = [], EJEMPLOS = {};
+  MODS.forEach(function (m) {
+    if (m.aprender.length) SEC.push({ tipo: "apr", mod: m.id, id: null });
+    m.aprender.forEach(function (a) { EJEMPLOS[a.id] = { a: a, m: m }; });
+    m.practicar.forEach(function (e, i) { TODOS.push({ e: e, m: m, i: i }); SEC.push({ tipo: "ej", mod: m.id, id: e.id }); });
+  });
+  function buscar(id) { for (var i = 0; i < TODOS.length; i++) if (TODOS[i].e.id === id) return TODOS[i]; return null; }
+  function modulo(id) { for (var i = 0; i < MODS.length; i++) if (MODS[i].id === id) return MODS[i]; return MODS[0]; }
+
+  /* ---------- Estado ---------- */
+  var VISTA0 = { tab: "aprender", mod: "m1", tipo: "apr", id: null };
+  var estado = { ej: {}, apr: {}, vista: Object.assign({}, VISTA0), libre: "", libreEsq: "nba" };
+  try {
+    var g = JSON.parse(localStorage.getItem(CLAVE));
+    if (g && g.ej) { estado.ej = g.ej; estado.apr = g.apr || {}; estado.libre = g.libre || ""; estado.libreEsq = g.libreEsq || "nba"; if (g.vista && g.vista.tab) estado.vista = g.vista; }
+  } catch (e) {}
+  function vistaValida(v) { return v && (v.tab === "referencia" || v.tab === "libre" || (v.tipo === "apr" && modulo(v.mod).aprender.length) || (v.tipo === "ej" && buscar(v.id))); }
+  if (!vistaValida(estado.vista)) estado.vista = Object.assign({}, VISTA0);
+  function guardarLocal() { try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) {} }
+  function guardar() { guardarLocal(); programarSubida(); }
+  function est(id) {
+    if (!estado.ej[id]) estado.ej[id] = { n: 0, primero: null, pistas: 0, vioSol: false, ok: false, como: null, nOk: null, q: "", q1: "", exp: 0 };
+    return estado.ej[id];
+  }
+  var vista = { solAbierta: false, ultimo: null, demo: false, revelados: {}, errores: {}, filas: null };
+  function limpiarVista() { vista.solAbierta = false; vista.ultimo = null; vista.demo = false; }
+
+  /* ---------- Motor ---------- */
+  var SQL = null, fijas = {};
+  function dbFija(k) { if (!fijas[k]) { var d = new SQL.Database(); d.run(ESQ[k]); fijas[k] = d; } return fijas[k]; }
+  function correrEn(d, q) {
+    var st = null;
+    try {
+      var limpio = String(q).replace(/;\s*$/, "").trim();
+      if (!limpio) throw new Error("vacia");
+      st = d.prepare(limpio);
+      var cols = st.getColumnNames(), filas = [];
+      while (st.step()) { filas.push(st.get()); if (filas.length > 2000) break; }
+      return { cols: cols, filas: filas };
+    } finally { if (st) try { st.free(); } catch (e) {} }
+  }
+  function fijo(k, q) { return correrEn(dbFija(k), q); }
+  function usuario(k, q) { var d = new SQL.Database(); try { d.run(ESQ[k]); return correrEn(d, q); } finally { try { d.close(); } catch (e) {} } }
+  function explicarError(msg) {
+    var m;
+    if (msg === "vacia") return "El editor está vacío. Escribe una consulta, aunque sea a medias.";
+    if ((m = /near "(.+?)": syntax error/.exec(msg))) return "Error de sintaxis cerca de «" + m[1] + "». Mira lo que escribiste justo antes: suele faltar una coma o una palabra clave (FROM, JOIN, ON), o sobra algo.";
+    if (/incomplete input/.test(msg)) return "La consulta está incompleta: quedó algo sin cerrar (un paréntesis, una comilla) o una cláusula sin terminar.";
+    if ((m = /no such table: (.+)/.exec(msg))) return "No existe la tabla «" + m[1] + "». Revisa el nombre en «Las tablas», y que el alias vaya después del nombre: FROM jugadores j.";
+    if ((m = /no such column: (.+)/.exec(msg))) return "No existe la columna «" + m[1] + "». Revisa el nombre en «Las tablas», y que el alias sea el de la tabla que la tiene.";
+    if ((m = /ambiguous column name: (.+)/.exec(msg))) return "La columna «" + m[1] + "» existe en más de una tabla. Dile al motor cuál quieres con el alias de la tabla, por ejemplo j." + m[1] + ".";
+    if (/misuse of aggregate/.test(msg)) return "Usaste COUNT, SUM o AVG donde no se puede, normalmente en el WHERE. ¿La condición se revisa mirando una sola fila? WHERE. ¿Necesita juntar varias? HAVING, después del GROUP BY.";
+    if ((m = /no such function: (.+)/.exec(msg))) return "La función «" + m[1] + "» no existe en este motor." + (/^(IF|IIF)$/i.test(m[1]) ? " Para una condición dentro de una columna usa CASE WHEN … THEN … ELSE … END." : "");
+    if (/a JOIN clause is required before ON/.test(msg)) return "ON solo puede ir después de un JOIN.";
+    return "El motor no pudo ejecutar la consulta.";
+  }
+  function clave(v) { return v === null ? "\u0000N" : (typeof v === "number" ? "n:" + (Math.round(v * 1e6) / 1e6) : "s:" + v); }
+  function comparar(u, x, orden) {
+    if (u.cols.length !== x.cols.length) return { ok: false, tipo: "columnas" };
+    function bolsa(filas, ordenar) { var b = {}; filas.forEach(function (f) { var c = f.map(clave); if (ordenar) c.sort(); var k = c.join("\u0001"); (b[k] = b[k] || []).push(f); }); return b; }
+    function iguales(a, b) { var k; for (k in a) if (!b[k] || b[k].length !== a[k].length) return false; for (k in b) if (!a[k]) return false; return true; }
+    var bu = bolsa(u.filas), bx = bolsa(x.filas), mismo = iguales(bu, bx), nota = null;
+    if (!mismo && iguales(bolsa(u.filas, true), bolsa(x.filas, true))) { mismo = true; nota = "Las columnas vienen en otro orden que en el enunciado, pero los datos son los mismos."; }
+    if (mismo && orden) {
+      var a = u.filas.map(function (f) { return f.map(clave).sort().join("\u0001"); }).join("\u0002"), b = x.filas.map(function (f) { return f.map(clave).sort().join("\u0001"); }).join("\u0002");
+      if (a !== b) return { ok: false, tipo: "orden" };
+    }
+    if (mismo) return { ok: true, nota: nota };
+    var faltan = [], sobran = [], k, i;
+    for (k in bx) for (i = (bu[k] ? bu[k].length : 0); i < bx[k].length; i++) faltan.push(bx[k][i]);
+    for (k in bu) for (i = (bx[k] ? bx[k].length : 0); i < bu[k].length; i++) sobran.push(bu[k][i]);
+    return { ok: false, tipo: "filas", faltan: faltan, sobran: sobran };
+  }
+
+  /* ---------- Piezas de dibujo ---------- */
+  var KW = ["SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "LEFT JOIN", "JOIN", "ON", "AND", "OR", "AS", "IN", "BETWEEN", "LIKE", "IS NOT NULL", "IS NULL", "NULL", "DISTINCT", "LIMIT", "DESC", "ASC", "WITH", "OVER", "PARTITION BY", "QUALIFY", "NOT", "EXCEPT", "TRUE", "CASE", "WHEN", "THEN", "ELSE", "END", "DATE", "DAY", "MONTH", "WEEK", "YEAR"];
+  var FN = ["COUNT", "SUM", "AVG", "MIN", "MAX", "COALESCE", "IFNULL", "LOWER", "ROW_NUMBER", "RANK", "COUNTIF", "EXTRACT", "DATE_TRUNC", "DATE_DIFF", "FORMAT_DATE", "SAFE_DIVIDE"];
+  var RE_SQL = new RegExp("(--[^\\n]*)|('(?:[^']|'')*')|(`[^`]*`)|\\b(" + KW.map(function (k) { return k.replace(/ /g, "\\s+"); }).join("|") + ")\\b|\\b(" + FN.join("|") + ")(?=\\s*\\()|\\b(\\d+(?:\\.\\d+)?)\\b", "g");
+  function escH(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function pintarSql(sql) {
+    var out = "", i = 0, m; RE_SQL.lastIndex = 0;
+    while ((m = RE_SQL.exec(sql))) { out += escH(sql.slice(i, m.index)); var c = m[1] ? "com" : (m[2] || m[3]) ? "str" : m[4] ? "kw" : m[5] ? "fn" : "num"; out += '<span class="' + c + '">' + escH(m[0]) + "</span>"; i = m.index + m[0].length; }
+    return out + escH(sql.slice(i));
+  }
+  function preSql(sql) { return el("pre", { class: "sql", html: pintarSql(sql) }); }
+  function tabla(res, hl, opts) {
+    opts = opts || {}; hl = hl || []; var bool = opts.bool || [];
+    var caja = el("div", { class: "t-scroll" + (opts.alta ? " alta" : "") });
+    if (!res.cols.length) { caja.appendChild(el("div", { class: "vacio", text: "La consulta no devuelve columnas." })); return caja; }
+    var t = el("table", { class: "res" }), tr = el("tr");
+    res.cols.forEach(function (c) { tr.appendChild(el("th", { class: hl.indexOf(c) >= 0 ? "k" : null, text: c })); });
+    t.appendChild(el("thead", null, tr));
+    var tb = el("tbody"), max = opts.max || 60;
+    res.filas.slice(0, max).forEach(function (f) {
+      var r = el("tr");
+      f.forEach(function (v, i) {
+        var col = res.cols[i], cls = [], txt;
+        if (hl.indexOf(col) >= 0) cls.push("k");
+        if (v === null) { cls.push("nul"); txt = "NULL"; }
+        else if (bool.indexOf(col) >= 0 && typeof v === "number") txt = v ? "true" : "false";
+        else if (typeof v === "number") { cls.push("num"); txt = Number.isInteger(v) ? String(v) : String(Math.round(v * 100) / 100); }
+        else txt = String(v);
+        r.appendChild(el("td", { class: cls.join(" ") || null, text: txt }));
+      });
+      tb.appendChild(r);
+    });
+    t.appendChild(tb); caja.appendChild(t);
+    if (!res.filas.length) caja.appendChild(el("div", { class: "vacio", text: "0 filas." }));
+    else if (res.filas.length > max) caja.appendChild(el("div", { class: "vacio", text: "Se muestran " + max + " de " + res.filas.length + " filas." }));
+    return caja;
+  }
+  function nFilas(n) { return n === 1 ? "1 fila" : n + " filas"; }
+  function bloqueResultado(titulo, res, hl, bool, max) { return el("div", { class: "t-wrap" }, el("div", { class: "t-tit", text: titulo + " · " + nFilas(res.filas.length) }), tabla(res, hl, { bool: bool, max: max || 30 })); }
+
+  /* ---------- Las tablas ---------- */
+  function panelTablas(k, abierto) {
+    var d = el("details", { class: "tablas-panel", open: abierto ? true : null }, el("summary", { text: k === "nba" ? "Las tablas: NBA 2015-16 y la final de 2016" : "Las tablas: el banco" }));
+    var cx = el("div", { class: "conexiones" }, el("span", { class: "muted", text: "Cómo se conectan:" }));
+    CONEX[k].forEach(function (c) { cx.appendChild(el("code", { text: c })); });
+    d.appendChild(cx);
+    var g = el("div", { class: "tchips" }), filas = el("div", { class: "filas-tabla" });
+    var cols = {}; TABLAS[k].forEach(function (t) { try { cols[t.nombre] = fijo(k, "SELECT * FROM " + t.nombre + " LIMIT 0").cols; } catch (e) { cols[t.nombre] = []; } });
+    TABLAS[k].forEach(function (t) {
+      var lista = el("div", { class: "cols" });
+      cols[t.nombre].forEach(function (c, i) { if (i) lista.appendChild(document.createTextNode(", ")); lista.appendChild(el("span", { class: t.llaves.indexOf(c) >= 0 ? "llave" : null, text: c })); });
+      g.appendChild(el("div", { class: "tchip" },
+        el("div", { class: "nom" }, el("b", { text: t.nombre }), el("span", { class: "muted", text: "alias: " + t.alias })),
+        lista, el("p", { text: t.nota }),
+        el("button", { class: "btn small", type: "button", onclick: function () {
+          filas.textContent = "";
+          if (vista.filas === k + t.nombre) { vista.filas = null; return; }
+          vista.filas = k + t.nombre; var r = fijo(k, "SELECT * FROM " + t.nombre);
+          filas.appendChild(el("div", { class: "res-head" }, el("b", { class: "mono", text: t.nombre }), el("span", { class: "muted", text: nFilas(r.filas.length) })));
+          filas.appendChild(tabla(r, t.llaves, { alta: true }));
+        } }, "Ver filas")));
+    });
+    d.appendChild(g); d.appendChild(filas);
+    return d;
+  }
+
+  /* ---------- Marcas de avance ---------- */
+  function marca(s) {
+    if (!s) return { g: "·", c: "", t: "sin intentar" };
+    if (s.ok && s.como === "sola") return { g: "✓", c: "sola", t: "resuelta sola" };
+    if (s.ok && s.como === "con pista") return { g: "✓", c: "conpista", t: "resuelta con pista" };
+    if (s.ok) return { g: "↻", c: "recon", t: "reescrita después de ver la solución" };
+    if (s.vioSol) return { g: "◐", c: "recon", t: "solución vista, falta reescribirla" };
+    if (s.n > 0) return { g: "×", c: "intento", t: "intentada, sin resolver" };
+    return { g: "·", c: "", t: "sin intentar" };
+  }
+  function cuentaMod(m) { var ok = m.practicar.filter(function (e) { var s = estado.ej[e.id]; return s && s.ok; }).length; var vis = m.aprender.filter(function (a) { return estado.apr[a.id]; }).length; return { ok: ok, total: m.practicar.length, vis: vis, apr: m.aprender.length }; }
+
+  /* ---------- Navegación ---------- */
+  function ir(v) { estado.vista = Object.assign({}, estado.vista, v); guardar(); limpiarVista(); pintarTodo(); var c = $("#contenido"); if (c && c.getBoundingClientRect().top < 0) c.scrollIntoView({ block: "start" }); }
+  function irSec(i) { var s = SEC[i]; if (s) ir({ tab: "aprender", tipo: s.tipo, mod: s.mod, id: s.id }); }
+  function idxSec() { var v = estado.vista; for (var i = 0; i < SEC.length; i++) if (SEC[i].tipo === v.tipo && SEC[i].mod === v.mod && (v.tipo === "apr" || SEC[i].id === v.id)) return i; return 0; }
+
+  function pintarAvance() {
+    var nba = TODOS.filter(function (x) { return x.m.esq === "nba"; }), bco = TODOS.filter(function (x) { return x.m.esq === "banco"; });
+    var a = nba.filter(function (x) { var s = estado.ej[x.e.id]; return s && s.ok; }).length, b = bco.filter(function (x) { var s = estado.ej[x.e.id]; return s && s.ok; }).length;
+    $("#avance").innerHTML = "NBA <b>" + a + "</b>/" + nba.length + " · banco <b>" + b + "</b>/" + bco.length;
+  }
+  function pintarPestanas() {
+    var P = $("#pestanas"); P.textContent = "";
+    [["aprender", "Aprender y practicar"], ["referencia", "Referencia"], ["libre", "Pizarra libre"]].forEach(function (p) {
+      P.appendChild(el("button", { type: "button", role: "tab", "aria-selected": estado.vista.tab === p[0] ? "true" : "false", onclick: function () { ir({ tab: p[0] }); } }, p[1]));
+    });
+  }
+  var navCerrada = true;
+  function pintarLista() {
+    var L = $("#lista"); L.textContent = ""; L.className = "lista" + (navCerrada ? " cerrada" : "");
+    var v = estado.vista;
+    L.appendChild(el("button", { class: "btn nav-toggle", type: "button", "aria-expanded": navCerrada ? "false" : "true", onclick: function () { navCerrada = !navCerrada; pintarLista(); } }, (navCerrada ? "Ver temas y ejercicios" : "Ocultar temas y ejercicios")));
+    MODS.forEach(function (m, mi) {
+      var c = cuentaMod(m), abierto = v.mod === m.id;
+      var box = el("div", { class: "modulo" + (abierto ? " abierto" : "") });
+      box.appendChild(el("button", { class: "modulo-btn", type: "button", onclick: function () { ir(m.aprender.length ? { tipo: "apr", mod: m.id, id: null } : { tipo: "ej", mod: m.id, id: m.practicar[0].id }); } },
+        el("span", { text: (m.esq === "nba" ? (mi + 1) + ". " : "") + m.titulo }), el("span", { class: "cuenta", text: c.total ? c.ok + "/" + c.total : c.vis + "/" + c.apr })));
+      if (abierto) {
+        var it = el("div", { class: "modulo-items" });
+        if (m.aprender.length) it.appendChild(el("button", { class: "ej-btn", type: "button", "aria-current": v.tipo === "apr" ? "true" : null, onclick: function () { ir({ tipo: "apr", mod: m.id, id: null }); } },
+          el("span", { class: "marca", "aria-hidden": "true", text: c.vis === c.apr ? "✓" : "›" }), el("span", { text: "Aprender · " + c.vis + " de " + c.apr + " vistos" })));
+        m.practicar.forEach(function (e, j) {
+          if (e.grupo) it.appendChild(el("div", { class: "grupo-nom", text: e.grupo }));
+          var mk = marca(estado.ej[e.id]);
+          it.appendChild(el("button", { class: "ej-btn", type: "button", "aria-current": v.tipo === "ej" && v.id === e.id ? "true" : null, onclick: function () { navCerrada = true; ir({ tipo: "ej", mod: m.id, id: e.id }); } },
+            el("span", { class: "marca " + mk.c, "aria-hidden": "true", text: mk.g }), el("span", null, (j + 1) + ". " + e.titulo, el("span", { class: "sr", text: " (" + mk.t + ")" }))));
+        });
+        box.appendChild(it);
+      }
+      L.appendChild(box);
+    });
+    L.appendChild(el("div", { class: "leyenda" },
+      el("span", { class: "marca sola", text: "✓" }), el("span", { text: "resuelta sola" }),
+      el("span", { class: "marca conpista", text: "✓" }), el("span", { text: "resuelta con pista" }),
+      el("span", { class: "marca recon", text: "↻" }), el("span", { text: "reescrita sin mirar la solución" }),
+      el("span", { class: "marca intento", text: "×" }), el("span", { text: "intentada, sin resolver" })));
+    L.appendChild(el("div", { class: "cierre" },
+      el("p", { class: "muted", text: "Al terminar el bloque, avísale a Claude en el chat. Si arriba dice «Avance guardado en tu cuenta», Claude lo lee solo; si no, usa «Copiar resumen para Claude» y pégalo." }),
+      el("button", { class: "btn small ghost", type: "button", onclick: reiniciar }, "Borrar mi avance")));
+  }
+  var armado = false;
+  function reiniciar(ev) {
+    var b = ev.currentTarget;
+    if (!armado) { armado = true; b.textContent = "¿Seguro? Toca de nuevo para borrar todo"; setTimeout(function () { armado = false; if (b.isConnected) b.textContent = "Borrar mi avance"; }, 4000); return; }
+    armado = false; estado.ej = {}; estado.apr = {}; estado.vista = Object.assign({}, VISTA0); guardar(); limpiarVista(); pintarTodo();
+  }
+
+  /* ---------- Aprender ---------- */
+  function pintarAprender(C, m) {
+    var c = cuentaMod(m);
+    C.appendChild(el("div", { class: "enun" },
+      el("div", { class: "meta" }, el("span", { class: "eyebrow", text: "Aprender · " + c.vis + " de " + c.apr + " ejemplos vistos" })),
+      el("h2", { text: m.titulo }), el("p", { class: "texto", text: m.intro })));
+    C.appendChild(el("p", { class: "atajo", text: "En cada ejemplo: lee la consulta, responde la pregunta en tu cabeza o en un papel, y recién ahí aprieta «Ver resultado». Si no calza con lo que pensaste, busca por qué antes de seguir." }));
+    var lec = el("div", { class: "leccion" });
+    m.aprender.forEach(function (a) { lec.appendChild(ejemploCard(a, m, false)); });
+    C.appendChild(lec);
+    var siguiente = m.practicar.length ? el("button", { class: "btn primary", type: "button", onclick: function () { ir({ tipo: "ej", mod: m.id, id: m.practicar[0].id }); } }, "Practicar: " + m.practicar[0].titulo + " →")
+      : el("p", { class: "atajo", text: "Estas funciones se practican directo en BigQuery." });
+    C.appendChild(el("div", { class: "cierre-leccion" },
+      el("h3", { text: "Antes de practicar" }),
+      el("p", { text: "Cierra los ejemplos y explica con tus palabras, en el chat o en un papel, qué hace cada pieza de este tema y cuándo la usarías. Si algo no sale, vuelve solo a ese ejemplo." }),
+      el("div", { class: "acciones" }, siguiente)));
+  }
+  function ejemploCard(a, m, ref) {
+    var card = el("article", { class: ref ? "ref-ficha" : "ejemplo", "data-t": (a.t + " " + a.p + " " + a.sql).toLowerCase() });
+    card.appendChild(el("header", null, el("h3", { text: a.t }), a.bq ? el("span", { class: "bq", text: "Sintaxis de BigQuery" }) : null, el("p", { text: a.p })));
+    var res = null; try { res = fijo(m.esq, a.run || a.sql); } catch (e) { res = null; }
+    function cuerpoRevelado() {
+      var r = el("div", { class: "revelado" });
+      if (ref) r.appendChild(el("div", { class: "par" }, preSql(a.sql), res ? bloqueResultado("Devuelve", res, a.hl, a.bool) : el("div", { class: "err-caja", text: "No se pudo ejecutar." })));
+      else if (res) r.appendChild(bloqueResultado("Devuelve", res, a.hl, a.bool));
+      if (a.ojo) r.appendChild(el("p", { class: "ojo-nota", html: a.ojo }));
+      if (a.pasos && a.pasos.length) {
+        var mo = el("div", { class: "motor" }, el("div", { class: "t-tit", text: "Cómo lo hace el motor, paso a paso" }));
+        var ol = el("ol", { class: "pasos" });
+        a.pasos.forEach(function (p) { var pc = el("div", { class: "paso-c" }, el("div", { class: "pt", text: p.t }), el("div", { class: "pd", html: p.d })); try { var rp = fijo(m.esq, p.q); pc.appendChild(tabla(rp, p.hl, { bool: p.bool, max: 20 })); pc.appendChild(el("div", { class: "pn", text: nFilas(rp.filas.length) })); } catch (e) {} ol.appendChild(el("li", null, pc)); });
+        mo.appendChild(ol); r.appendChild(mo);
+      }
+      if (a.mal) {
+        var box = el("div", { class: "con-error" }, el("div", { class: "t-tit", text: "Con el error" }));
+        var rm = null, em = null; try { rm = fijo(m.esq, a.mal.run || a.mal.sql); } catch (e) { em = e.message; }
+        box.appendChild(el("div", { class: "par" }, preSql(a.mal.sql), rm ? bloqueResultado("Devuelve", rm, a.mal.hl) : el("div", { class: "err-caja", text: "Error. No se ejecuta." })));
+        box.appendChild(el("p", { html: a.mal.nota }));
+        if (ref || vista.errores[a.id]) r.appendChild(box);
+        else r.appendChild(el("button", { class: "btn small", type: "button", onclick: function (ev) { vista.errores[a.id] = true; ev.currentTarget.replaceWith(box); } }, "Ver la versión con error"));
+      }
+      return r;
+    }
+    if (ref) { card.appendChild(cuerpoRevelado()); return card; }
+    card.appendChild(preSql(a.sql));
+    if (vista.revelados[a.id]) card.appendChild(cuerpoRevelado());
+    else {
+      var pr = el("div", { class: "predice" }, el("p", null, el("b", { text: "Antes de mirar: " }), a.pregunta || "¿Qué crees que devuelve?"),
+        el("button", { class: "btn", type: "button", onclick: function () { vista.revelados[a.id] = true; if (!estado.apr[a.id]) { estado.apr[a.id] = true; guardar(); pintarLista(); } pr.replaceWith(cuerpoRevelado()); } }, "Ver resultado"));
+      card.appendChild(pr);
+    }
+    return card;
+  }
+
+  /* ---------- Ejercicio ---------- */
+  function pintarEjercicio(C, x) {
+    var e = x.e, m = x.m, s = est(e.id), mk = marca(s);
+    C.appendChild(el("div", { class: "enun" },
+      el("div", { class: "meta" }, el("span", { class: "eyebrow", text: m.titulo + " · ejercicio " + (x.i + 1) + " de " + m.practicar.length }), el("span", { class: "chip", text: e.practica }), el("span", { class: "chip estado " + mk.c, text: mk.t })),
+      el("h2", { text: e.titulo }), el("p", { class: "texto", text: e.enunciado }),
+      el("p", { class: "cols" }, "Columnas, en este orden: ", el("span", { class: "mono", text: e.columnas }), e.orden ? el("span", { text: " · el orden de las filas importa" }) : null)));
+    var ed = el("textarea", { id: "editor", spellcheck: "false", autocomplete: "off", autocorrect: "off", autocapitalize: "off", "aria-label": "Tu consulta SQL", placeholder: "Escribe aquí tu consulta…" });
+    ed.value = vista.demo ? vista.demoQ : (s.q || "");
+    ed.addEventListener("input", function () { vista.demo = false; s.q = ed.value; guardar(); });
+    ed.addEventListener("keydown", teclas);
+    var sinIntento = s.n < 1 && !s.vioSol;
+    C.appendChild(el("div", { class: "editor-box" }, ed,
+      el("div", { class: "acciones" },
+        el("button", { class: "btn primary", type: "button", onclick: function () { correr(x); } }, "Ejecutar y comprobar"),
+        el("button", { class: "btn", type: "button", title: "Muestra el resultado sin comprobarlo. No cuenta como intento.", onclick: function () { correr(x, true); } }, "Solo ejecutar"),
+        el("button", { class: "btn", type: "button", disabled: s.pistas >= e.pistas.length, onclick: function () { s.pistas++; guardar(); pintarLista(); pintarContenido(); } }, s.pistas >= e.pistas.length ? "No quedan pistas" : "Pedir pista (" + (s.pistas + 1) + " de " + e.pistas.length + ")"),
+        el("button", { class: "btn", type: "button", disabled: sinIntento, title: sinIntento ? "Primero un intento con «Ejecutar y comprobar», aunque esté a medias" : null, onclick: function () { vista.solAbierta = !vista.solAbierta; if (vista.solAbierta && !s.ok) { s.vioSol = true; guardar(); } if (!vista.solAbierta) vista.demo = false; pintarLista(); pintarContenido(); } }, vista.solAbierta ? "Ocultar la solución" : "Ver solución y paso a paso"),
+        el("span", { class: "sep" }), el("span", { class: "atajo", text: "Ctrl + Enter comprueba" }))));
+    C.appendChild(el("p", { class: "atajo", text: (sinIntento ? "La solución se abre después de tu primer intento con «Ejecutar y comprobar». " : "") + "«Solo ejecutar» no cuenta: sirve para mirar una tabla o probar un pedazo. Si no sabes cómo empezar, el tema tiene su sección «Aprender»." }));
+    for (var i = 0; i < s.pistas; i++) C.appendChild(el("div", { class: "ayuda" }, el("b", { text: "Pista " + (i + 1) + ". " }), e.pistas[i]));
+    if (vista.ultimo) C.appendChild(vista.ultimo);
+    if (vista.solAbierta) C.appendChild(panelSol(x, s));
+    var idx = idxSec();
+    C.appendChild(el("div", { class: "nav" },
+      el("button", { class: "btn", type: "button", disabled: idx === 0, onclick: function () { irSec(idx - 1); } }, "← Anterior"),
+      el("button", { class: "btn", type: "button", disabled: idx >= SEC.length - 1, onclick: function () { irSec(idx + 1); } }, "Siguiente →")));
+  }
+  function teclas(ev) {
+    var ed = ev.currentTarget;
+    if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") { ev.preventDefault(); if (estado.vista.tab === "libre") correrLibre(); else { var x = buscar(estado.vista.id); if (x) correr(x); } }
+    else if (ev.key === "Tab" && !ev.shiftKey && !ev.altKey && !ev.ctrlKey) { ev.preventDefault(); var a = ed.selectionStart, b = ed.selectionEnd; ed.value = ed.value.slice(0, a) + "  " + ed.value.slice(b); ed.selectionStart = ed.selectionEnd = a + 2; ed.dispatchEvent(new Event("input")); }
+  }
+  function cajaError(msg) { return el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: explicarError(msg) }), msg === "vacia" ? null : el("div", { class: "orig", text: "Mensaje del motor: " + msg })); }
+  function correr(x, soloVer) {
+    if (!SQL) return;
+    var e = x.e, m = x.m, s = est(e.id), q = $("#editor").value, esDemo = vista.demo, caja = el("div", { style: "display:flex;flex-direction:column;gap:12px" }), res = null, err = null, cmp = null;
+    try { res = usuario(m.esq, q); } catch (z) { err = z.message || String(z); }
+    var exp = fijo(m.esq, e.sol);
+    if (soloVer) {
+      if (!esDemo && err !== "vacia") { s.exp = (s.exp || 0) + 1; s.q = q; guardar(); }
+      if (err) caja.appendChild(cajaError(err));
+      else { caja.appendChild(el("div", { class: "veredicto info", role: "status" }, el("div", { class: "tit", text: "Ejecutada sin comprobar. No cuenta como intento." }))); caja.appendChild(el("div", { class: "res-head" }, el("h3", { text: "Lo que devuelve" }), el("span", { class: "muted", text: nFilas(res.filas.length) }))); caja.appendChild(tabla(res, null, { alta: true })); }
+    } else {
+      if (!err) cmp = comparar(res, exp, e.orden);
+      var bien = !!(cmp && cmp.ok);
+      if (!esDemo && err !== "vacia") {
+        s.n++; s.q = q;
+        if (s.primero === null) { s.primero = bien; s.q1 = q; }
+        if (bien && !s.ok && !vista.solAbierta) { s.ok = true; s.nOk = s.n; s.como = s.vioSol ? "reconstruida" : (s.pistas > 0 ? "con pista" : "sola"); }
+        guardar();
+      }
+      if (err) caja.appendChild(cajaError(err));
+      else if (esDemo) caja.appendChild(el("div", { class: "veredicto info", role: "status" }, el("div", { class: "tit", text: "Este es el error típico, ejecutado. No cuenta como intento tuyo." }), el("div", { text: bien ? "" : "Devuelve " + nFilas(res.filas.length) + "; la solución devuelve " + nFilas(exp.filas.length) + "." })));
+      else if (bien && vista.solAbierta && !s.ok) caja.appendChild(el("div", { class: "veredicto info", role: "status" }, el("div", { class: "tit", text: "Está correcta, pero con la solución a la vista." }), el("div", { text: "Ocúltala, borra el editor y escríbela de nuevo sin mirar. Ahí cuenta." })));
+      else if (bien) caja.appendChild(el("div", { class: "veredicto ok", role: "status" }, el("div", { class: "tit", text: "Correcto: " + nFilas(res.filas.length) + ", las mismas que la solución." }), cmp.nota ? el("div", { text: cmp.nota }) : null, el("div", { text: "Abre el paso a paso para comparar tu camino con el de la solución." })));
+      else if (cmp.tipo === "columnas") caja.appendChild(el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: "Tu resultado tiene " + res.cols.length + (res.cols.length === 1 ? " columna" : " columnas") + " y se esperaban " + exp.cols.length + "." }), el("div", { text: "Revisa qué columnas pide el enunciado: " + e.columnas + "." })));
+      else if (cmp.tipo === "orden") caja.appendChild(el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: "Las filas son las correctas, pero en otro orden." }), el("div", { text: "Este ejercicio pide un orden: revisa el ORDER BY (¿falta DESC?)." })));
+      else {
+        var v = el("div", { class: "veredicto mal", role: "status" }, el("div", { class: "tit", text: "Todavía no. Tu consulta devuelve " + nFilas(res.filas.length) + " y se esperaban " + nFilas(exp.filas.length) + "." }));
+        var dif = el("div", { class: "dif" });
+        if (cmp.faltan.length) dif.appendChild(el("div", null, el("span", { class: "eyebrow", text: "Te faltan (" + cmp.faltan.length + ")" }), tabla({ cols: exp.cols, filas: cmp.faltan }, null, { max: 4 })));
+        if (cmp.sobran.length) dif.appendChild(el("div", null, el("span", { class: "eyebrow", text: "Te sobran (" + cmp.sobran.length + ")" }), tabla({ cols: res.cols, filas: cmp.sobran }, null, { max: 4 })));
+        v.appendChild(dif); caja.appendChild(v);
+      }
+      if (res) { caja.appendChild(el("div", { class: "res-head" }, el("h3", { text: "Lo que devuelve tu consulta" }), el("span", { class: "muted", text: nFilas(res.filas.length) }))); caja.appendChild(tabla(res, null, { alta: true })); }
+    }
+    vista.ultimo = caja;
+    var pos = $("#editor").selectionStart;
+    pintarLista(); pintarAvance(); pintarContenido();
+    var ed = $("#editor"); ed.value = q; ed.focus(); try { ed.selectionStart = ed.selectionEnd = pos; } catch (z) {}
+  }
+  function panelSol(x, s) {
+    var e = x.e, m = x.m, box = el("section", { class: "solucion", "aria-label": "Solución" });
+    box.appendChild(el("p", { class: "eyebrow", text: "Una forma de resolverlo" }));
+    box.appendChild(preSql(e.sol));
+    box.appendChild(el("h3", { text: "Paso a paso: qué hace el motor con cada parte" }));
+    var ol = el("ol", { class: "pasos" });
+    (e.pasos || []).forEach(function (p) {
+      var c = el("div", { class: "paso-c" }, el("div", { class: "pt", text: p.t }), el("div", { class: "pd", html: p.d }));
+      try { var r = fijo(m.esq, p.q); c.appendChild(tabla(r, p.hl, { bool: p.bool, max: 20 })); c.appendChild(el("div", { class: "pn", text: nFilas(r.filas.length) + (p.hl && p.hl.length ? " · en amarillo, lo que importa en este paso" : "") })); } catch (z) {}
+      ol.appendChild(el("li", null, c));
+    });
+    box.appendChild(ol);
+    if (e.ojo || e.mal) {
+      var ojo = el("div", { class: "ojo" }, el("span", { class: "eyebrow", text: e.mal ? "Error típico" : "Para no olvidar" }), e.ojo ? el("div", { html: e.ojo }) : null);
+      if (e.mal) ojo.appendChild(el("div", null, el("button", { class: "btn small", type: "button", onclick: function () { vista.demo = true; vista.demoQ = e.mal; pintarContenido(); correr(x); window.scrollTo({ top: $("#editor").getBoundingClientRect().top + window.scrollY - 90 }); } }, "Ejecutar este error para verlo")));
+      box.appendChild(ojo);
+    }
+    box.appendChild(el("div", { class: "acciones" },
+      el("button", { class: "btn primary", type: "button", onclick: function () { vista.solAbierta = false; vista.demo = false; vista.ultimo = null; s.q = ""; guardar(); pintarContenido(); $("#editor").focus(); window.scrollTo({ top: $("#contenido").getBoundingClientRect().top + window.scrollY - 12 }); } }, "Ocultar y reescribirla sin mirar"),
+      el("span", { class: "atajo", text: "Verla no es saberla. Cuenta cuando la escribes de nuevo con la solución cerrada." })));
+    return box;
+  }
+
+  /* ---------- Referencia ---------- */
+  function pintarReferencia(C) {
+    C.appendChild(el("div", { class: "enun" }, el("h2", { text: "Referencia" }), el("p", { class: "texto", text: "Todos los ejemplos de las lecciones, con su resultado a la vista. Para consultar cuando ya intentaste; para estudiar un tema por primera vez, usa «Aprender»." })));
+    C.appendChild(el("div", { class: "orden" },
+      el("h3", { text: "El orden en que se escribe y el orden en que se ejecuta" }),
+      el("div", { class: "orden-chips" }, el("span", { class: "muted", text: "Se escribe:" }), "SELECT · FROM · JOIN … ON · WHERE · GROUP BY · HAVING · ORDER BY · LIMIT"),
+      (function () { var d = el("div", { class: "orden-chips" }, el("span", { class: "muted", text: "Se ejecuta:" })); [["FROM y JOIN", "arma la tabla"], ["WHERE", "saca filas"], ["GROUP BY", "forma grupos"], ["HAVING", "saca grupos"], ["SELECT", "elige y calcula"], ["ORDER BY", "ordena"], ["LIMIT", "corta"]].forEach(function (p, i) { if (i) d.appendChild(el("i", { text: "→" })); d.appendChild(el("span", null, (i + 1) + " " + p[0], el("em", { text: p[1] }))); }); return d; })(),
+      el("p", { class: "atajo", text: "Por eso el WHERE no puede usar COUNT ni SUM (los grupos aún no existen) y el HAVING sí. Y por eso un nombre puesto con AS en el SELECT no sirve en el WHERE." })));
+    var inp = el("input", { id: "buscar", type: "search", placeholder: "Buscar: having, null, join, case…", "aria-label": "Buscar en la referencia", autocomplete: "off" });
+    var sin = el("p", { class: "muted", text: "Ningún ejemplo coincide con esa búsqueda.", hidden: true });
+    C.appendChild(inp);
+    var secs = [];
+    MODULOS_NBA.forEach(function (mm) {
+      var m = modulo(mm.id), sec = el("section", { class: "ref-sec" }, el("h2", { text: m.titulo }));
+      m.aprender.forEach(function (a) { sec.appendChild(ejemploCard(a, m, true)); });
+      C.appendChild(sec); secs.push(sec);
+    });
+    C.appendChild(sin);
+    var bq = el("section", { class: "ref-sec" }, el("h2", { text: "Solo en BigQuery" }));
+    var t1 = el("table", { class: "ref" }, el("thead", null, el("tr", null, el("th", { text: "Qué" }), el("th", { text: "Cómo se escribe" }), el("th", { text: "Para qué" }))));
+    var b1 = el("tbody"); SOLO_BIGQUERY.forEach(function (f) { b1.appendChild(el("tr", null, el("td", { text: f[0] }), el("td", null, el("code", { text: f[1] })), el("td", { text: f[2] }))); }); t1.appendChild(b1);
+    bq.appendChild(el("div", { class: "t-scroll ancha" }, t1)); C.appendChild(bq);
+    var er = el("section", { class: "ref-sec" }, el("h2", { text: "Errores frecuentes" }), el("p", { class: "atajo", text: "Los que no dan error son los más peligrosos: la consulta corre y entrega un resultado equivocado." }));
+    var t2 = el("table", { class: "ref" }, el("thead", null, el("tr", null, el("th", { text: "Lo que escribes" }), el("th", { text: "Lo que pasa" }), el("th", { text: "Cómo va" }), el("th", { text: "La regla" }))));
+    var b2 = el("tbody"); ERRORES_FRECUENTES.forEach(function (f) { b2.appendChild(el("tr", null, el("td", null, el("code", { class: "rojo", text: f[0] })), el("td", { text: f[1] }), el("td", null, el("code", { text: f[2] })), el("td", { text: f[3] }))); }); t2.appendChild(b2);
+    er.appendChild(el("div", { class: "t-scroll ancha" }, t2)); C.appendChild(er);
+    inp.addEventListener("input", function () {
+      var t = inp.value.trim().toLowerCase(), n = 0;
+      secs.forEach(function (s) { var vis = 0; [].slice.call(s.querySelectorAll(".ref-ficha")).forEach(function (f) { var ok = !t || f.getAttribute("data-t").indexOf(t) >= 0; f.hidden = !ok; if (ok) vis++; }); s.hidden = !vis; n += vis; });
+      sin.hidden = n > 0;
+    });
+  }
+
+  /* ---------- Pizarra libre ---------- */
+  function pintarLibre(C) {
+    C.appendChild(el("div", { class: "enun" }, el("h2", { text: "Pizarra libre" }), el("p", { class: "texto", text: "Ejecuta lo que quieras sobre las tablas, para probar una idea suelta o armar una consulta por partes." })));
+    var sel = el("select", { id: "libre-esq", "aria-label": "Qué tablas usar", onchange: function () { estado.libreEsq = sel.value; guardar(); vista.ultimo = null; pintarContenido(); } },
+      el("option", { value: "nba", selected: estado.libreEsq === "nba" ? true : null }, "Tablas NBA"), el("option", { value: "banco", selected: estado.libreEsq === "banco" ? true : null }, "Tablas del banco"));
+    C.appendChild(el("div", { class: "acciones" }, el("span", { class: "muted", text: "Tablas:" }), sel));
+    C.appendChild(panelTablas(estado.libreEsq, false));
+    var ed = el("textarea", { id: "editor", spellcheck: "false", autocomplete: "off", autocorrect: "off", autocapitalize: "off", "aria-label": "Tu consulta SQL", placeholder: estado.libreEsq === "nba" ? "SELECT * FROM jugadores" : "SELECT * FROM clientes" });
+    ed.value = estado.libre || ""; ed.addEventListener("input", function () { estado.libre = ed.value; guardar(); }); ed.addEventListener("keydown", teclas);
+    C.appendChild(el("div", { class: "editor-box" }, ed, el("div", { class: "acciones" }, el("button", { class: "btn primary", type: "button", onclick: correrLibre }, "Ejecutar"), el("span", { class: "sep" }), el("span", { class: "atajo", text: "Ctrl + Enter ejecuta" }))));
+    if (vista.ultimo) C.appendChild(vista.ultimo);
+  }
+  function correrLibre() {
+    var q = $("#editor").value, caja = el("div", { style: "display:flex;flex-direction:column;gap:12px" });
+    try { var r = usuario(estado.libreEsq, q); caja.appendChild(el("div", { class: "res-head" }, el("h3", { text: "Resultado" }), el("span", { class: "muted", text: nFilas(r.filas.length) }))); caja.appendChild(tabla(r, null, { alta: true })); }
+    catch (z) { caja.appendChild(cajaError(z.message || String(z))); }
+    vista.ultimo = caja; pintarContenido(); $("#editor").focus();
+  }
+
+  /* ---------- Contenido ---------- */
+  function pintarContenido() {
+    var C = $("#contenido"); C.textContent = "";
+    var v = estado.vista;
+    if (!SQL) { C.appendChild(el("p", { class: "muted", text: "Cargando la base de datos…" })); return; }
+    if (v.tab === "referencia") return pintarReferencia(C);
+    if (v.tab === "libre") return pintarLibre(C);
+    var m = modulo(v.mod);
+    C.appendChild(panelTablas(m.esq, false));
+    if (v.tipo === "apr") pintarAprender(C, m);
+    else { var x = buscar(v.id); if (x) pintarEjercicio(C, x); }
+  }
+  function pintarTodo() {
+    pintarAvance(); pintarPestanas();
+    var aprender = estado.vista.tab === "aprender";
+    $("#lista").hidden = !aprender; $("#banco").classList.toggle("solo", !aprender);
+    if (aprender) pintarLista();
+    pintarContenido();
+  }
+
+  /* ---------- Resumen ---------- */
+  function textoResumen() {
+    var d = new Date(), L = ["Taller de SQL · resumen del " + d.toLocaleDateString("es-CL") + " a las " + d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })];
+    MODS.forEach(function (m) {
+      var c = cuentaMod(m), lineas = [];
+      m.practicar.forEach(function (e, j) {
+        var s = estado.ej[e.id]; if (!s || (!s.n && !s.vioSol && !s.exp)) return;
+        lineas.push("  " + (j + 1) + ". " + e.titulo + " [" + e.id + "]: " + marca(s).t + " · intentos " + s.n + (s.ok ? " (salió al " + s.nOk + ".º)" : "") + " · primer intento " + (s.primero === null ? "sin comprobar" : (s.primero ? "bien" : "mal")) + " · pistas " + s.pistas + " · vio la solución " + (s.vioSol ? "sí" : "no") + (s.exp ? " · ejecuciones sin comprobar " + s.exp : ""));
+        if (s.primero === false && s.q1) lineas.push("     primer intento: " + s.q1.replace(/\s+/g, " ").slice(0, 400));
+        if (!s.ok && s.q && s.q !== s.q1) lineas.push("     último intento: " + s.q.replace(/\s+/g, " ").slice(0, 400));
+      });
+      if (!lineas.length && !c.vis) return;
+      L.push("", m.titulo + ": " + (c.apr ? "ejemplos vistos " + c.vis + " de " + c.apr + " · " : "") + "resueltos " + c.ok + " de " + c.total);
+      L = L.concat(lineas);
+    });
+    return L.join("\n");
+  }
+  function copiarResumen() {
+    var txt = textoResumen(), ta = $("#resumen"), b = $("#copiar");
+    ta.value = txt;
+    function manual() { ta.hidden = false; ta.focus(); ta.select(); b.textContent = "Selecciona el texto y cópialo con Ctrl+C"; }
+    try { navigator.clipboard.writeText(txt).then(function () { b.textContent = "Copiado. Pégalo en el chat"; setTimeout(function () { if (b.isConnected) b.textContent = "Copiar resumen para Claude"; }, 3500); }, manual); }
+    catch (z) { manual(); }
+  }
+
+  /* ---------- Timer ---------- */
+  var fin = null, tic = null, audio = null;
+  function pintarTimer() {
+    var b = $("#timer"); if (!fin) { b.textContent = "Timer 25:00"; b.className = "btn timer"; return; }
+    var r = Math.max(0, Math.round((fin - Date.now()) / 1000));
+    b.textContent = (r ? "Quedan " : "Sonó ") + String(Math.floor(r / 60)).padStart(2, "0") + ":" + String(r % 60).padStart(2, "0");
+    b.className = "btn timer " + (r ? "on" : "fin");
+    if (!r) { clearInterval(tic); tic = null; $("#aviso-timer").hidden = false; pitar(); }
+  }
+  function pitar() { try { if (!audio) return; [0, 0.35, 0.7].forEach(function (d) { var o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = 660; g.gain.value = 0.08; o.connect(g); g.connect(audio.destination); o.start(audio.currentTime + d); o.stop(audio.currentTime + d + 0.2); }); } catch (z) {} }
+  $("#timer").addEventListener("click", function () {
+    $("#aviso-timer").hidden = true;
+    if (fin && fin > Date.now()) { fin = null; clearInterval(tic); tic = null; pintarTimer(); return; }
+    try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); } catch (z) {}
+    fin = Date.now() + 25 * 60 * 1000; clearInterval(tic); tic = setInterval(pintarTimer, 1000); pintarTimer();
+  });
+  $("#copiar").addEventListener("click", copiarResumen);
+
+  /* ---------- Avance en la cuenta ---------- */
+  var nube = { ref: null, estado: "local", ultimo: null, t: null, escribiendo: false, pendiente: false };
+  function pintarNube() {
+    var c = $("#nube"); if (!c) return;
+    c.textContent = { local: "Avance guardado solo en este navegador", conectando: "Buscando tu avance…", ok: "Avance guardado en tu cuenta", guardando: "Guardando…", error: "Sin conexión con tu cuenta: por ahora se guarda en este navegador" }[nube.estado];
+    c.className = "nube " + nube.estado;
+  }
+  var CAMPOS = ["n", "primero", "pistas", "vioSol", "ok", "como", "nOk", "q", "q1", "exp"];
+  function limpiar(ej) {
+    var out = {}; Object.keys(ej || {}).sort().forEach(function (id) {
+      if (!buscar(id)) return; var a = ej[id] || {}, b = {};
+      CAMPOS.forEach(function (c) { var v = a[c]; if (v === undefined) return; b[c] = typeof v === "string" ? v.slice(0, 3000) : v; });
+      if (b.n || b.vioSol || b.exp || b.q) out[id] = b;
+    }); return out;
+  }
+  function limpiarApr(apr) { var out = {}; Object.keys(apr || {}).sort().forEach(function (id) { if (EJEMPLOS[id] && apr[id]) out[id] = true; }); return out; }
+  function firmaDe(d) { var v = d.vista && typeof d.vista === "object" ? [d.vista.tab, d.vista.mod, d.vista.tipo, d.vista.id || null] : null; return JSON.stringify([limpiar(d.ej), limpiarApr(d.apr), v, String(d.libre || "").slice(0, 4000)]); }
+  function hayAvance() { return Object.keys(limpiar(estado.ej)).length > 0 || Object.keys(limpiarApr(estado.apr)).length > 0 || !!estado.libre; }
+  function subir() {
+    if (!nube.ref) return;
+    clearTimeout(nube.t);
+    var f = firmaDe(estado); if (f === nube.ultimo) return;
+    if (nube.escribiendo) { nube.pendiente = true; return; }
+    nube.escribiendo = true; nube.estado = "guardando"; pintarNube();
+    var v = estado.vista;
+    nube.ref.set({ v: 2, ej: limpiar(estado.ej), apr: limpiarApr(estado.apr), vista: { tab: v.tab, mod: v.mod, tipo: v.tipo || null, id: v.id || null }, libre: String(estado.libre || "").slice(0, 4000), actualizado: new Date().toISOString() })
+      .then(function () { nube.ultimo = f; nube.estado = "ok"; }, function () { nube.estado = "error"; })
+      .then(function () { nube.escribiendo = false; pintarNube(); if (nube.pendiente) { nube.pendiente = false; programarSubida(); } });
+  }
+  function programarSubida() { if (!nube.ref) return; clearTimeout(nube.t); nube.t = setTimeout(subir, 2500); }
+  function copia(x) { var r = { n: 0, primero: null, pistas: 0, vioSol: false, ok: false, como: null, nOk: null, q: "", q1: "", exp: 0 }; CAMPOS.forEach(function (c) { if (x[c] !== undefined) r[c] = x[c]; }); return r; }
+  function mejor(a, b) {
+    if (!a || !(a.n || a.vioSol || a.exp || a.q)) return b ? copia(b) : a;
+    if (!b) return a;
+    var pa = (a.ok ? 1000 : 0) + (a.n || 0), pb = (b.ok ? 1000 : 0) + (b.n || 0);
+    var gg = pb > pa ? b : a, o = gg === a ? b : a, r = copia(gg);
+    if (!r.q && o.q) r.q = o.q; if (!r.q1 && o.q1) r.q1 = o.q1;
+    r.pistas = Math.max(a.pistas || 0, b.pistas || 0); r.vioSol = !!(a.vioSol || b.vioSol); r.exp = Math.max(a.exp || 0, b.exp || 0);
+    return r;
+  }
+  function fusionar(rem) {
+    var antes = firmaDe(estado), vacio = !hayAvance(), ids = {}, k;
+    for (k in estado.ej) ids[k] = 1; for (k in (rem.ej || {})) ids[k] = 1;
+    for (k in ids) { if (!buscar(k)) continue; var mm = mejor(estado.ej[k], rem.ej ? rem.ej[k] : null); if (mm) estado.ej[k] = mm; }
+    for (k in (rem.apr || {})) if (EJEMPLOS[k] && rem.apr[k]) estado.apr[k] = true;
+    if (vacio && rem.vista && typeof rem.vista === "object" && vistaValida(rem.vista)) estado.vista = { tab: rem.vista.tab, mod: rem.vista.mod, tipo: rem.vista.tipo, id: rem.vista.id };
+    if (!estado.libre && rem.libre) estado.libre = String(rem.libre);
+    guardarLocal();
+    return firmaDe(estado) !== antes;
+  }
+  function bajar() {
+    if (!nube.ref) return;
+    nube.ref.get().then(function (snap) {
+      var d = snap.exists ? (snap.data() || {}) : null, cambio = false;
+      if (d) { cambio = fusionar(d); nube.ultimo = firmaDe(d); }
+      nube.estado = "ok"; pintarNube();
+      if (cambio && SQL) { var ed = $("#editor"), escribiendo = ed && document.activeElement === ed; pintarAvance(); if (estado.vista.tab === "aprender") pintarLista(); if (!escribiendo) { limpiarVista(); pintarTodo(); } }
+      if (hayAvance() && firmaDe(estado) !== nube.ultimo) programarSubida();
+    }, function () { nube.estado = "error"; pintarNube(); });
+  }
+  function conectarNube() {
+    pintarNube();
+    if (!window.claude || typeof window.claude.use !== "function") return;
+    nube.estado = "conectando"; pintarNube();
+    Promise.all([window.claude.use("db"), window.claude.use("user")]).then(function (r) {
+      if (!r[0] || !r[1]) { nube.estado = "local"; pintarNube(); return; }
+      return r[1].id().then(function (id) {
+        if (!id) { nube.estado = "local"; pintarNube(); return; }
+        nube.ref = r[0].doc("data/users/" + id + "/progreso");
+        bajar();
+        document.addEventListener("visibilitychange", function () { if (document.hidden) subir(); else bajar(); });
+      });
+    }).catch(function () { nube.estado = "error"; pintarNube(); });
+  }
+
+  /* ---------- Arranque ---------- */
+  function fallo(txt) { var a = $("#aviso-motor"); a.textContent = txt; a.hidden = false; }
+  function arrancar() {
+    if (typeof initSqlJs !== "function") return fallo("No se pudo cargar el motor de base de datos. Recarga la página; si sigue igual, avísale a Claude.");
+    initSqlJs().then(function (S) { SQL = S; try { fijo("nba", "SELECT 1"); fijo("banco", "SELECT 1"); } catch (z) { return fallo("El motor cargó pero no pudo crear las tablas: " + z.message); } pintarTodo(); conectarNube(); },
+      function (z) { fallo("No se pudo iniciar el motor de base de datos: " + (z && z.message ? z.message : z)); });
+  }
+  pintarTodo();
+  if (typeof initSqlJs === "function") arrancar();
+  else { var sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-asm.js"; sc.onload = arrancar; sc.onerror = arrancar; document.head.appendChild(sc); }
+})();
+
+</script>
+
+</body>
+</html>
